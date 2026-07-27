@@ -1,0 +1,20 @@
+repo-walker:
+  term: repo-walker
+  definition: >
+    A CLI that renders a hand-authored markdown walkthrough into a static,
+    wizard-style teaching site. It never generates content itself — only
+    renders it.
+
+render-pipeline:
+  term: render pipeline
+  definition: >
+    The goldmark-based Go code (internal/render) that parses a step's
+    frontmatter and body, then emits the HTML fragment the wizard swaps in.
+
+content-format-spec:
+  term: content-format spec
+  definition: >
+    The single contract (docs/content-format.md) both the Go renderer and the
+    authoring skill obey — derived from what the Phase 0 prototype actually
+    needed, nothing speculative.
+  learn_more: https://github.com/bashfulrobot/repo-walker/blob/main/docs/content-format.md
