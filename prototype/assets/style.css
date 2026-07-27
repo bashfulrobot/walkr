@@ -469,6 +469,8 @@ pre.code code { display: block; padding: 0 18px; }
 .kw { color: var(--teal); }
 .tp { color: var(--amber-bright); }
 .st { color: #c9b78a; }
+.nm { color: #d68a5f; }
+.pn { color: var(--paper-faint); }
 .cm { color: var(--paper-faint); font-style: italic; }
 
 .footnotes {

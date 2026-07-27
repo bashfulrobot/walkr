@@ -148,18 +148,18 @@ graph TB
         </p>
 
         <div class="manifest">
-          <pre class="code"><code><span class="ln"><span class="kw">apiVersion</span>: apps/v1</span>
-<span class="ln"><span class="kw">kind</span>: Deployment</span>
+          <pre class="code"><code><span class="ln"><span class="kw">apiVersion</span>: <span class="st">apps/v1</span></span>
+<span class="ln"><span class="kw">kind</span>: <span class="tp">Deployment</span></span>
 <span class="ln"><span class="kw">spec</span>:</span>
-<span class="ln is-marked">  replicas: <span class="st">2</span><span class="mark">1</span></span>
-<span class="ln">  template:</span>
-<span class="ln">    spec:</span>
-<span class="ln">      containers:</span>
-<span class="ln">        - name: repo-walker</span>
-<span class="ln is-marked">          readinessProbe:<span class="mark">2</span></span>
-<span class="ln">            httpGet: { path: /healthz, port: 8080 }</span>
-<span class="ln is-marked">          resources:<span class="mark">3</span></span>
-<span class="ln">            limits: { cpu: "200m", memory: "128Mi" }</span></code></pre>
+<span class="ln is-marked">  <span class="kw">replicas</span>: <span class="nm">2</span><span class="mark">1</span></span>
+<span class="ln">  <span class="kw">template</span>:</span>
+<span class="ln">    <span class="kw">spec</span>:</span>
+<span class="ln">      <span class="kw">containers</span>:</span>
+<span class="ln">        <span class="pn">-</span> <span class="kw">name</span>: <span class="st">repo-walker</span></span>
+<span class="ln is-marked">          <span class="kw">readinessProbe</span>:<span class="mark">2</span></span>
+<span class="ln">            <span class="kw">httpGet</span>: <span class="pn">{</span> <span class="kw">path</span>: <span class="st">/healthz</span>, <span class="kw">port</span>: <span class="nm">8080</span> <span class="pn">}</span></span>
+<span class="ln is-marked">          <span class="kw">resources</span>:<span class="mark">3</span></span>
+<span class="ln">            <span class="kw">limits</span>: <span class="pn">{</span> <span class="kw">cpu</span>: <span class="st">"200m"</span>, <span class="kw">memory</span>: <span class="st">"128Mi"</span> <span class="pn">}</span></span></code></pre>
         </div>
         <ul class="footnotes">
           <li><span class="mark">1</span> Two replicas — this is a static-site server, so redundancy is cheap and mostly guards against node drain.</li>
