@@ -14,7 +14,7 @@ spec:
   template:
     spec:
       containers:
-        - name: repo-walker
+        - name: walkr
           readinessProbe:
             httpGet: { path: /healthz, port: 8080 }
           resources:

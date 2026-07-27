@@ -9,8 +9,8 @@ import (
 
 // classifyLine wraps tokens in a code line with the same span classes
 // prototype/assets/style.css expects (.kw/.tp/.st/.nm/.pn/.cm). This is a
-// small heuristic classifier for the languages repo-walker itself teaches
-// with, not a general tokenizer — see docs/content-format.md.
+// small heuristic classifier for the languages walkr itself teaches
+// with, not a general tokenizer — see docs/ai/content-format.md.
 func classifyLine(lang, line string) string {
 	switch lang {
 	case "go", "golang":

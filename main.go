@@ -1,5 +1,5 @@
-// Command repo-walker renders a hand-authored markdown walkthrough into an
-// interactive, wizard-style static site. See docs/content-format.md for the
+// Command walkr renders a hand-authored markdown walkthrough into an
+// interactive, wizard-style static site. See docs/ai/content-format.md for the
 // authoring format and extras/prompt/ai-prompt.md for the project brief.
 package main
 
@@ -13,8 +13,8 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/bashfulrobot/repo-walker/internal/site"
-	"github.com/bashfulrobot/repo-walker/internal/walkthrough"
+	"github.com/bashfulrobot/walkr/internal/site"
+	"github.com/bashfulrobot/walkr/internal/walkthrough"
 )
 
 func main() {
@@ -26,7 +26,7 @@ func main() {
 
 func rootCmd() *cobra.Command {
 	root := &cobra.Command{
-		Use:   "repo-walker",
+		Use:   "walkr",
 		Short: "Render a hand-authored markdown walkthrough into an interactive teaching site",
 	}
 	root.AddCommand(buildCmd(), serveCmd(), initCmd())
@@ -40,7 +40,7 @@ func buildCmd() *cobra.Command {
 		Short: "Render a walkthrough directory into a self-contained static site",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			dir := ".repo-walker"
+			dir := ".walkr"
 			if len(args) == 1 {
 				dir = args[0]
 			}
@@ -67,7 +67,7 @@ func serveCmd() *cobra.Command {
 		Short: "Build to a temp dir and serve it locally for preview",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			dir := ".repo-walker"
+			dir := ".walkr"
 			if len(args) == 1 {
 				dir = args[0]
 			}
@@ -75,7 +75,7 @@ func serveCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			tmp, err := os.MkdirTemp("", "repo-walker-serve-*")
+			tmp, err := os.MkdirTemp("", "walkr-serve-*")
 			if err != nil {
 				return err
 			}
@@ -102,7 +102,7 @@ func initCmd() *cobra.Command {
 		Short: "Scaffold an empty walkthrough",
 		Args:  cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			dir := ".repo-walker"
+			dir := ".walkr"
 			if len(args) == 1 {
 				dir = args[0]
 			}
@@ -118,7 +118,7 @@ func scaffold(dir string) error {
 			return err
 		}
 	}
-	manifest := "title: Repo Walker\ntagline: Field Guide\nrepo: org/repo\n"
+	manifest := "title: Walkr\ntagline: Field Guide\nrepo: org/repo\n"
 	if err := writeIfAbsent(filepath.Join(dir, "walkthrough.yaml"), manifest); err != nil {
 		return err
 	}

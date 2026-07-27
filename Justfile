@@ -1,12 +1,12 @@
-# repo-walker dev recipes
+# walkr dev recipes
 
-# Build the repo-walker binary
+# Build the walkr binary
 build:
-    go build -o repo-walker .
+    go build -o walkr .
 
-# Build the .repo-walker walkthrough and serve it locally, opening a browser
+# Build the .walkr walkthrough and serve it locally, opening a browser
 serve:
-    go run . serve .repo-walker --open
+    go run . serve .walkr --open
 
 # Run the test suite
 test:
@@ -17,7 +17,7 @@ lint:
     go vet ./...
     gofmt -l .
 
-# Build the .repo-walker walkthrough to ./site for a quick look
+# Build the .walkr walkthrough to ./site for a quick look
 demo:
-    go run . build .repo-walker -o ./site
+    go run . build .walkr -o ./site
     echo "open ./site/index.html"

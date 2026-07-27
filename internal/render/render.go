@@ -1,6 +1,6 @@
 // Package render turns one step's frontmatter+body (see
 // internal/walkthrough) into the HTML fragment the site assembler embeds.
-// See docs/content-format.md for the directive syntax this package implements.
+// See docs/ai/content-format.md for the directive syntax this package implements.
 package render
 
 import (
@@ -15,7 +15,7 @@ import (
 	"github.com/yuin/goldmark/renderer/html"
 	"github.com/yuin/goldmark/util"
 
-	"github.com/bashfulrobot/repo-walker/internal/walkthrough"
+	"github.com/bashfulrobot/walkr/internal/walkthrough"
 )
 
 // Result is one step's rendered output.
@@ -52,7 +52,7 @@ var inlineMarkdown = goldmark.New(
 // framing (all raw-text preprocessing), then goldmark (which applies the
 // annotated-code directive via a custom node renderer). For layout
 // code-walk/config, the content before/after the annotated code block is
-// then wrapped per docs/content-format.md.
+// then wrapped per docs/ai/content-format.md.
 func RenderStep(step walkthrough.Step, gl walkthrough.Glossary) (*Result, error) {
 	md := step.Body
 	md, deeps := extractDeepDives(md, step.ID)

@@ -1,4 +1,4 @@
-// Package walkthrough loads a .repo-walker/ directory into memory: the
+// Package walkthrough loads a .walkr/ directory into memory: the
 // optional global manifest, the glossary, and every step's frontmatter+body.
 package walkthrough
 
@@ -13,7 +13,7 @@ import (
 )
 
 // Manifest is walkthrough.yaml. Every field here is consumed by the rail
-// header — see docs/content-format.md. Don't add a field the UI doesn't render.
+// header — see docs/ai/content-format.md. Don't add a field the UI doesn't render.
 type Manifest struct {
 	Title   string `yaml:"title"`
 	Tagline string `yaml:"tagline"`
@@ -30,7 +30,7 @@ type GlossaryEntry struct {
 // Glossary maps a def id to its entry.
 type Glossary map[string]GlossaryEntry
 
-// Layout is a step's render_mode. See docs/content-format.md.
+// Layout is a step's render_mode. See docs/ai/content-format.md.
 type Layout string
 
 const (
@@ -51,14 +51,14 @@ type Step struct {
 	Body    string // raw markdown, frontmatter stripped
 }
 
-// Walkthrough is a fully loaded .repo-walker/ directory.
+// Walkthrough is a fully loaded .walkr/ directory.
 type Walkthrough struct {
 	Manifest Manifest
 	Glossary Glossary
 	Steps    []Step
 }
 
-// Load reads dir (a .repo-walker/-shaped directory) into a Walkthrough.
+// Load reads dir (a .walkr/-shaped directory) into a Walkthrough.
 func Load(dir string) (*Walkthrough, error) {
 	wt := &Walkthrough{Glossary: Glossary{}}
 
@@ -70,7 +70,7 @@ func Load(dir string) (*Walkthrough, error) {
 		return nil, err
 	}
 	if wt.Manifest.Title == "" {
-		wt.Manifest.Title = "Repo Walker"
+		wt.Manifest.Title = "Walkr"
 	}
 	if wt.Manifest.Tagline == "" {
 		wt.Manifest.Tagline = "Field Guide"

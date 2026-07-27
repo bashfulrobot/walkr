@@ -1,7 +1,7 @@
-# repo-walker content format
+# walkr content format
 
-This is the contract between the `repo-walker` renderer and anything that authors a
-walkthrough (a human, or the `repo-walker-author` skill). Every key and directive below
+This is the contract between the `walkr` renderer and anything that authors a
+walkthrough (a human, or the `walkr-author` skill). Every key and directive below
 was derived from the Phase 0 prototype (`prototype/`) — nothing here exists that the UI
 doesn't render. If you're extending this format, the rule stays the same: build the UI
 interaction first, then add the frontmatter key or directive that drives it.
@@ -9,7 +9,7 @@ interaction first, then add the frontmatter key or directive that drives it.
 ## Layout
 
 ```
-.repo-walker/
+.walkr/
 ├─ walkthrough.yaml     # optional global manifest
 ├─ glossary.yaml         # hover/click term definitions
 └─ steps/
@@ -25,12 +25,12 @@ Optional. Three fields, all consumed by the rail header (`rail__mark`, `rail__ta
 `rail__repo` in the prototype):
 
 ```yaml
-title: Repo Walker          # rail__mark — big italic wordmark, top-left
+title: Walkr          # rail__mark — big italic wordmark, top-left
 tagline: Field Guide        # rail__tag — small caps line under the title
-repo: repo-walker/repo-walker  # rail__repo — monospace pill, e.g. an org/repo slug
+repo: walkr/walkr  # rail__repo — monospace pill, e.g. an org/repo slug
 ```
 
-If absent, `repo-walker init` seeds sensible defaults and the CLI derives `repo` from
+If absent, `walkr init` seeds sensible defaults and the CLI derives `repo` from
 the target directory's git remote when it can.
 
 There is deliberately no `groups[]` key. The prototype's rail is a flat, ordered list —
@@ -92,7 +92,7 @@ plain CommonMark/GFM (goldmark + the `github.com/yuin/goldmark/extension` GFM ta
 ### Glossary term
 
 ```markdown
-[repo-walker]{def=repo-walker}
+[walkr]{def=walkr}
 ```
 
 Renders the bracketed text as a dotted-underline `.term` span. `def` is looked up in
@@ -103,12 +103,12 @@ fetch. Hover *or* click toggles the popover (see `prototype/assets/app.js`).
 `glossary.yaml`:
 
 ```yaml
-repo-walker:
-  term: repo-walker
+walkr:
+  term: walkr
   definition: >
     A CLI that renders a hand-authored markdown walkthrough into a static,
     wizard-style teaching site. It never generates content itself.
-  learn_more: https://github.com/bashfulrobot/repo-walker   # optional
+  learn_more: https://github.com/bashfulrobot/walkr   # optional
 ```
 
 ### Deep-dive modal
@@ -187,5 +187,5 @@ languages need a classifier added in `internal/render` (documented there, not he
 - No `group`/section headers in the rail.
 - No fetching external docs (pkg.go.dev, etc.) for glossary content — authored only.
 - No generic syntax-highlighting engine (chroma/Prism) — hand-classified spans per the
-  small set of languages repo-walker itself needs to teach. Revisit if/when a real
+  small set of languages walkr itself needs to teach. Revisit if/when a real
   walkthrough needs a language the classifier doesn't cover.

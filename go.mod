@@ -1,4 +1,4 @@
-module github.com/bashfulrobot/repo-walker
+module github.com/bashfulrobot/walkr
 
 go 1.26.5
 
