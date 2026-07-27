@@ -1,4 +1,4 @@
-// repo-walker — Phase 0 prototype wiring.
+// walkr — Phase 0 prototype wiring.
 // Dummy in-page data only. Real content is authored markdown, rendered server-side by Go.
 
 document.addEventListener('alpine:init', () => {

@@ -1,10 +1,10 @@
-# repo-walker: pure Go CLI, no cgo, no frontend build step.
+# walkr: pure Go CLI, no cgo, no frontend build step.
 { lib
 , buildGoModule
 }:
 
 buildGoModule {
-  pname = "repo-walker";
+  pname = "walkr";
   version = "0.0.1";
 
   src = lib.cleanSource ../.;
@@ -23,8 +23,8 @@ buildGoModule {
 
   meta = {
     description = "Renders a hand-authored markdown walkthrough into a static site";
-    homepage = "https://github.com/bashfulrobot/repo-walker";
+    homepage = "https://github.com/bashfulrobot/walkr";
     license = lib.licenses.mit;
-    mainProgram = "repo-walker";
+    mainProgram = "walkr";
   };
 }

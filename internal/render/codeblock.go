@@ -15,9 +15,9 @@ import (
 
 // codeBoundary is written immediately before a fenced code block's <pre>, so
 // RenderStep can split "content before the code" from "the code itself" to
-// apply the layout-specific wrapper (see docs/content-format.md, layouts
+// apply the layout-specific wrapper (see docs/ai/content-format.md, layouts
 // code-walk and config). Not visible in output — split out before returning.
-const codeBoundary = "\x00REPO-WALKER-CODE-BOUNDARY\x00"
+const codeBoundary = "\x00WALKR-CODE-BOUNDARY\x00"
 
 var pathAttrRe = regexp.MustCompile(`path="([^"]*)"`)
 var markAttrRe = regexp.MustCompile(`mark=([0-9,]+)`)

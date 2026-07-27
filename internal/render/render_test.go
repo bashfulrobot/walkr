@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/bashfulrobot/repo-walker/internal/walkthrough"
+	"github.com/bashfulrobot/walkr/internal/walkthrough"
 )
 
 func TestRenderStep_CodeWalk_AnnotatesMarkedLines(t *testing.T) {
@@ -73,9 +73,9 @@ func TestRenderStep_MarkCountMismatchIsAnError(t *testing.T) {
 
 func TestRenderStep_GlossaryTermExpandsFromDefinition(t *testing.T) {
 	gl := walkthrough.Glossary{
-		"repo-walker": {Term: "repo-walker", Definition: "A CLI that renders authored markdown."},
+		"walkr": {Term: "walkr", Definition: "A CLI that renders authored markdown."},
 	}
-	step := walkthrough.Step{ID: "overview", Layout: walkthrough.LayoutOverview, Body: "See [repo-walker]{def=repo-walker} for details.\n"}
+	step := walkthrough.Step{ID: "overview", Layout: walkthrough.LayoutOverview, Body: "See [walkr]{def=walkr} for details.\n"}
 	res, err := RenderStep(step, gl)
 	if err != nil {
 		t.Fatalf("RenderStep: %v", err)

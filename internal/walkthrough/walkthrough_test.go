@@ -31,7 +31,7 @@ func TestLoad_OrdersStepsAndAppliesDefaults(t *testing.T) {
 	if wt.Steps[0].Title != "First" || wt.Steps[1].Title != "Second" {
 		t.Fatalf("steps not ordered correctly: %+v", wt.Steps)
 	}
-	if wt.Manifest.Title != "Repo Walker" {
+	if wt.Manifest.Title != "Walkr" {
 		t.Errorf("expected default manifest title, got %q", wt.Manifest.Title)
 	}
 }

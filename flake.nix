@@ -1,5 +1,5 @@
 {
-  description = "repo-walker — renders a hand-authored markdown walkthrough into a static site";
+  description = "walkr — renders a hand-authored markdown walkthrough into a static site";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
@@ -8,10 +8,10 @@
 
   outputs = { self, nixpkgs, flake-utils, ... }:
     let
-      # The overlay adds `repo-walker` to pkgs. Pure Go, no CGO, so it is
+      # The overlay adds `walkr` to pkgs. Pure Go, no CGO, so it is
       # system-independent wherever Go itself builds.
       overlay = final: prev: {
-        repo-walker = final.callPackage ./nix/repo-walker.nix { };
+        walkr = final.callPackage ./nix/walkr.nix { };
       };
     in
     flake-utils.lib.eachDefaultSystem (system:
@@ -23,8 +23,8 @@
       in
       {
         packages = {
-          repo-walker = pkgs.repo-walker;
-          default = pkgs.repo-walker;
+          walkr = pkgs.walkr;
+          default = pkgs.walkr;
         };
 
         devShells.default = pkgs.mkShell {
@@ -38,7 +38,7 @@
       }
     ) // {
       # Overlay is system-independent; expose it at the top level so consumers
-      # can do `inputs.repo-walker.overlays.default` and reference `pkgs.repo-walker`.
+      # can do `inputs.walkr.overlays.default` and reference `pkgs.walkr`.
       overlays.default = overlay;
     };
 }

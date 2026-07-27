@@ -1,22 +1,22 @@
 ---
-name: repo-walker-author
-description: Author a repo-walker walkthrough for a codebase — analyze a target repository and generate a `.repo-walker/` directory (walkthrough.yaml, glossary.yaml, steps/*.md) that the `repo-walker` CLI renders into an interactive teaching site. Use when the user says "author a repo-walker walkthrough", "generate a walkthrough for this repo", "/repo-walker-author", "build a .repo-walker directory", "onboard someone to this repo with repo-walker", "explain this codebase step by step for repo-walker", or points at a repo and asks for a guided tour / newcomer walkthrough / teaching site for it. This skill is portable — it is meant to be copied into a target repo's `.claude/skills/repo-walker-author/` and run there; it does not require the repo-walker binary itself to be present, only the target repo to analyze.
+name: walkr-author
+description: Author a walkr walkthrough for a codebase — analyze a target repository and generate a `.walkr/` directory (walkthrough.yaml, glossary.yaml, steps/*.md) that the `walkr` CLI renders into an interactive teaching site. Use when the user says "author a walkr walkthrough", "generate a walkthrough for this repo", "/walkr-author", "build a .walkr directory", "onboard someone to this repo with walkr", "explain this codebase step by step for walkr", or points at a repo and asks for a guided tour / newcomer walkthrough / teaching site for it. This skill is portable — it is meant to be copied into a target repo's `.claude/skills/walkr-author/` and run there; it does not require the walkr binary itself to be present, only the target repo to analyze.
 allowed-tools: ["Read", "Glob", "Grep", "Write", "Edit", "Bash"]
 ---
 
-# repo-walker-author
+# walkr-author
 
-You are authoring a `.repo-walker/` walkthrough for a target repository — a hand-written
-markdown content set that the `repo-walker` CLI renders into a static, wizard-style teaching
+You are authoring a `.walkr/` walkthrough for a target repository — a hand-written
+markdown content set that the `walkr` CLI renders into a static, wizard-style teaching
 site for a newcomer. **You do not generate HTML and you do not run the renderer.** Your only
 job is to produce markdown + YAML that conforms *exactly* to the content-format contract,
 because the renderer trusts authored content completely and does no content generation of
 its own.
 
-This skill is portable: it may be running inside the `repo-walker` repo itself, or it may
-have been copied into some other repo's `.claude/skills/repo-walker-author/` to document
+This skill is portable: it may be running inside the `walkr` repo itself, or it may
+have been copied into some other repo's `.claude/skills/walkr-author/` to document
 *that* repo. Either way, treat the repo you were asked to walk through as "the target repo" —
-never assume it's repo-walker's own source.
+never assume it's walkr's own source.
 
 ## Step 0 — load the contract, every time
 
@@ -24,11 +24,11 @@ Before writing a single file, read **`references/content-format.md`**, bundled i
 skill's own directory (next to this file) — the same directory this SKILL.md lives in,
 resolved as `<this-skill>/references/content-format.md`. That file is the complete,
 locked contract for frontmatter keys, the three layouts, and the four directives. It is
-authoritative over everything summarized below and over any prior memory of repo-walker's
+authoritative over everything summarized below and over any prior memory of walkr's
 format — if the two ever disagree, the bundled file wins.
 
 Also read **`references/worked-example.md`** in this skill's directory — a full, correct,
-line-by-line-annotated worked example (repo-walker's own dogfood walkthrough) showing what
+line-by-line-annotated worked example (walkr's own dogfood walkthrough) showing what
 compliant output actually looks like, including a demonstration of the `mark=`/footnote
 line-counting rule. Pattern-match your output against it.
 
@@ -55,7 +55,7 @@ whether the target is Go, TypeScript, Python, Rust, a Helm chart repo, or anythi
    dependency injection, routing tables, event buses, plugin registration, whatever the
    target's own idiom is. You're building the overview diagram's edges, not an exhaustive
    call graph — aim for the 4-8 node picture a newcomer needs to orient, matching the
-   granularity of repo-walker's own overview diagram (skill → steps → render pipeline →
+   granularity of walkr's own overview diagram (skill → steps → render pipeline →
    HTML → wizard → diagrams).
 3. **Find notable code paths.** 2-6 files/functions that are the conceptual core — the
    pipeline that does the repo's actual job, not every file. A "notable code path" is
@@ -76,7 +76,7 @@ whether the target is Go, TypeScript, Python, Rust, a Helm chart repo, or anythi
 
 Use `Read`/`Grep`/`Glob` liberally during analysis; `Bash` only for read-only exploration
 (`git log`, `git remote -v` to derive the `repo:` slug, `find`, `wc -l`) — this skill never
-needs to modify the target repo outside of writing the new `.repo-walker/` directory.
+needs to modify the target repo outside of writing the new `.walkr/` directory.
 
 ## Step 2 — plan the sequence
 
@@ -303,11 +303,11 @@ enforces several of these at build time and will fail loudly rather than degrade
 
 ## Output location
 
-Write to `.repo-walker/` at the root of the target repository (the same repo you analyzed
+Write to `.walkr/` at the root of the target repository (the same repo you analyzed
 in Step 1), matching this layout exactly:
 
 ```
-.repo-walker/
+.walkr/
 ├─ walkthrough.yaml
 ├─ glossary.yaml
 └─ steps/
@@ -316,8 +316,8 @@ in Step 1), matching this layout exactly:
    └─ ...
 ```
 
-This skill does not invoke the `repo-walker` binary and does not need it installed to do
+This skill does not invoke the `walkr` binary and does not need it installed to do
 its job — it only needs to produce content that conforms to the spec. If the binary is
-available in the environment (`repo-walker build .repo-walker -o /tmp/site` /
-`repo-walker serve .repo-walker --open`), offer to run it so the user can preview the
+available in the environment (`walkr build .walkr -o /tmp/site` /
+`walkr serve .walkr --open`), offer to run it so the user can preview the
 result, but authoring the correct markdown/YAML is the actual deliverable.

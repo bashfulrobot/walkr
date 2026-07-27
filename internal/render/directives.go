@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/bashfulrobot/repo-walker/internal/walkthrough"
+	"github.com/bashfulrobot/walkr/internal/walkthrough"
 )
 
 // DeepDive is one :::deep{...}::: block, rendered into the page's single

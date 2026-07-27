@@ -6,7 +6,7 @@ order: 1
 layout: overview
 summary: Four moving pieces, one contract between them. Start here before touching any code.
 ---
-[repo-walker]{def=repo-walker} reads a folder of authored steps and turns them into the
+[walkr]{def=walkr} reads a folder of authored steps and turns them into the
 page you're looking at right now. The steps are plain markdown with frontmatter; a small
 [render pipeline]{def=render-pipeline} turns that into HTML; the browser side
 (Alpine + Mermaid) handles navigation, modals, and diagrams — no server required once
@@ -14,7 +14,7 @@ it's built.
 
 ```mermaid title="structure.mmd"
 graph TB
-  F["repo-walker-author<br/>skill"] -->|writes| A[".repo-walker/<br/>steps"]
+  F["walkr-author<br/>skill"] -->|writes| A[".walkr/<br/>steps"]
   A -->|parsed by| B["render pipeline<br/>(goldmark)"]
   B -->|emits| C["index.html<br/>+ fragments"]
   C -->|hydrated by| D["Alpine.js<br/>wizard"]

@@ -1,6 +1,6 @@
-# Worked example: repo-walker's own dogfood walkthrough
+# Worked example: walkr's own dogfood walkthrough
 
-This is `repo-walker`'s own `.repo-walker/` directory, reproduced here verbatim as a
+This is `walkr`'s own `.walkr/` directory, reproduced here verbatim as a
 known-good pattern to imitate. It is small on purpose (4 steps) — real walkthroughs will
 have more steps per layer, but the shape (one flat `order` sequence, big-picture →
 code-walk → config → recap) and the exact syntax of every directive are what to copy.
@@ -11,16 +11,16 @@ Read this alongside `references/content-format.md` (the rules) — this file is 
 ## `walkthrough.yaml`
 
 ```yaml
-title: Repo Walker
+title: Walkr
 tagline: Field Guide
-repo: bashfulrobot/repo-walker
+repo: bashfulrobot/walkr
 ```
 
 ## `glossary.yaml`
 
 ```yaml
-repo-walker:
-  term: repo-walker
+walkr:
+  term: walkr
   definition: >
     A CLI that renders a hand-authored markdown walkthrough into a static,
     wizard-style teaching site. It never generates content itself — only
@@ -35,13 +35,13 @@ render-pipeline:
 content-format-spec:
   term: content-format spec
   definition: >
-    The single contract (docs/content-format.md) both the Go renderer and the
+    The single contract (docs/ai/content-format.md) both the Go renderer and the
     authoring skill obey — derived from what the Phase 0 prototype actually
     needed, nothing speculative.
-  learn_more: https://github.com/bashfulrobot/repo-walker/blob/main/docs/content-format.md
+  learn_more: https://github.com/bashfulrobot/walkr/blob/main/docs/ai/content-format.md
 ```
 
-Note the top-level keys (`repo-walker`, `render-pipeline`, `content-format-spec`) are the
+Note the top-level keys (`walkr`, `render-pipeline`, `content-format-spec`) are the
 `def=` identifiers used in the body text — they don't have to match the visible bracketed
 text or the `term:` field word-for-word (e.g. `def=render-pipeline` displays whatever text
 is inside the `[...]` brackets at the call site, while `term: render pipeline` is what the
@@ -58,7 +58,7 @@ order: 1
 layout: overview
 summary: Four moving pieces, one contract between them. Start here before touching any code.
 ---
-[repo-walker]{def=repo-walker} reads a folder of authored steps and turns them into the
+[walkr]{def=walkr} reads a folder of authored steps and turns them into the
 page you're looking at right now. The steps are plain markdown with frontmatter; a small
 [render pipeline]{def=render-pipeline} turns that into HTML; the browser side
 (Alpine + Mermaid) handles navigation, modals, and diagrams — no server required once
@@ -66,7 +66,7 @@ it's built.
 
 ​```mermaid title="structure.mmd"
 graph TB
-  F["repo-walker-author<br/>skill"] -->|writes| A[".repo-walker/<br/>steps"]
+  F["walkr-author<br/>skill"] -->|writes| A[".walkr/<br/>steps"]
   A -->|parsed by| B["render pipeline<br/>(goldmark)"]
   B -->|emits| C["index.html<br/>+ fragments"]
   C -->|hydrated by| D["Alpine.js<br/>wizard"]
@@ -158,7 +158,7 @@ spec:
   template:
     spec:
       containers:
-        - name: repo-walker
+        - name: walkr
           readinessProbe:
             httpGet: { path: /healthz, port: 8080 }
           resources:

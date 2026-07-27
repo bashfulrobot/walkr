@@ -1,4 +1,4 @@
-// repo-walker — client wizard runtime.
+// walkr — client wizard runtime.
 // Step content is server-rendered (goldmark, internal/render); this file
 // only drives navigation, the shared deep-dive modal, and Mermaid init.
 // Adapted from prototype/assets/app.js — see that file's history for the

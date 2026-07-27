@@ -13,9 +13,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/bashfulrobot/repo-walker/assets"
-	"github.com/bashfulrobot/repo-walker/internal/render"
-	"github.com/bashfulrobot/repo-walker/internal/walkthrough"
+	"github.com/bashfulrobot/walkr/assets"
+	"github.com/bashfulrobot/walkr/internal/render"
+	"github.com/bashfulrobot/walkr/internal/walkthrough"
 )
 
 //go:embed page.html.tmpl
