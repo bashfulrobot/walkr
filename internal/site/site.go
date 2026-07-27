@@ -107,7 +107,60 @@ func Build(wt *walkthrough.Walkthrough, outDir string) error {
 		return err
 	}
 
+	if err := copyMedia(wt.Dir, outDir); err != nil {
+		return err
+	}
+
 	return nil
+}
+
+// copyMedia copies <walkthroughDir>/media/ to <outDir>/media/ when present.
+// Absence is not an error — most walkthroughs have no author-supplied assets.
+func copyMedia(walkthroughDir, outDir string) error {
+	mediaDir := filepath.Join(walkthroughDir, "media")
+	info, err := os.Stat(mediaDir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	if !info.IsDir() {
+		return fmt.Errorf("%s: expected a directory", mediaDir)
+	}
+	return copyDir(mediaDir, filepath.Join(outDir, "media"))
+}
+
+// copyDir recursively copies a real on-disk directory tree, byte-for-byte,
+// to destDir. Unlike copyEmbeddedDir this walks os.DirFS rather than an
+// embed.FS, since media/ is author-supplied content on disk, not compiled
+// into the binary.
+func copyDir(srcDir, destDir string) error {
+	return filepath.WalkDir(srcDir, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		rel, err := filepath.Rel(srcDir, path)
+		if err != nil {
+			return err
+		}
+		target := filepath.Join(destDir, rel)
+		if d.IsDir() {
+			return os.MkdirAll(target, 0o755)
+		}
+		src, err := os.Open(path)
+		if err != nil {
+			return err
+		}
+		defer src.Close()
+		dst, err := os.Create(target)
+		if err != nil {
+			return err
+		}
+		defer dst.Close()
+		_, err = io.Copy(dst, src)
+		return err
+	})
 }
 
 // copyEmbeddedDir copies an embed.FS subtree to a real directory on disk.
