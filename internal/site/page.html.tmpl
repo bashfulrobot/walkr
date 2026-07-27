@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>{{.Title}} &mdash; walkthrough</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="assets/style.css" />
+<script src="vendor/alpine.min.js" defer></script>
+<script src="vendor/mermaid.min.js"></script>
+</head>
+<body x-data="walker()" x-init="init()" x-on:keydown.window="onKey($event)">
+
+  <div class="shell">
+    <nav class="rail">
+      <div class="rail__brand"><span class="rail__mark">{{.Title}}</span></div>
+      <div class="rail__tag">{{.Tagline}}</div>
+      <div class="rail__repo">$ {{.Repo}}</div>
+
+      <ol class="itinerary">
+        <template x-for="(s, i) in steps" :key="s.id">
+          <li class="itinerary__item" :class="{ 'is-active': i === current, 'is-done': i < current }">
+            <span class="itinerary__num" x-text="i < current ? '&check;' : String(i + 1).padStart(2,'0')"></span>
+            <button class="itinerary__btn" type="button" x-on:click="go(i)">
+              <span class="itinerary__title" x-text="s.title"></span>
+              <span class="itinerary__kind" x-text="s.kind"></span>
+            </button>
+          </li>
+        </template>
+      </ol>
+
+      <div class="rail__progress">
+        <span x-text="`${current + 1} / ${steps.length}`"></span>
+        <span class="rail__progress-bar"><span class="rail__progress-fill" :style="`width: ${((current+1)/steps.length)*100}%`"></span></span>
+      </div>
+    </nav>
+
+    <div class="divider"></div>
+
+    <main class="stage" :data-step-no="String(current + 1).padStart(2,'0')">
+      {{range $i, $s := .Steps}}
+      <section class="step step-enter" x-show="current === {{$i}}" x-cloak>
+        <p class="step__eyebrow">Chapter {{$s.ChapterNo}} &middot; {{$s.Kind}}</p>
+        <h1 class="step__title">{{$s.TitleHTML}}</h1>
+        <p class="step__lede">{{$s.Summary}}</p>
+        <div class="prose">{{$s.BodyHTML}}</div>
+      </section>
+      {{end}}
+    </main>
+  </div>
+
+  <div class="navbar">
+    <span class="navbar__hint">&larr; / &rarr;</span>
+    <button class="navbtn" type="button" x-on:click="prev()" :disabled="current === 0" aria-label="Previous step">&lsaquo;</button>
+    <button class="navbtn navbtn--primary" type="button" x-on:click="next()" :disabled="current === steps.length - 1" aria-label="Next step">&rsaquo;</button>
+  </div>
+
+  <div class="modal-veil" x-show="modal" x-cloak x-on:click.self="closeModal()" x-on:keydown.escape.window="closeModal()">
+    <div class="modal" x-show="modal" x-transition>
+      <button class="modal__close" type="button" x-on:click="closeModal()">&#10005; close</button>
+      {{range .DeepDives}}
+      <template x-if="modal === '{{.ID}}'">
+        <div>
+          <p class="modal__eyebrow">Go deeper</p>
+          <h2 class="modal__title">{{.Title}}</h2>
+          <div class="modal__body">{{.BodyHTML}}</div>
+        </div>
+      </template>
+      {{end}}
+    </div>
+  </div>
+
+  <script>window.__REPO_WALKER_STEPS__ = {{.StepsJSON}};</script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
