@@ -232,8 +232,23 @@ layout exactly:
    └─ ...
 ```
 
-This skill does not invoke the `walkr` binary and does not need it installed to do
-its job, it only needs to produce content that conforms to the spec. If the binary
-is available in the environment, offer to run it so the user can preview the
-result (`walkr build .walkr -o /tmp/site` / `walkr serve .walkr --open`), but
-authoring the correct markdown/YAML is the actual deliverable.
+This skill does not need the `walkr` binary installed to do its job, it only
+needs to produce content that conforms to the spec. Authoring the correct
+markdown/YAML is the actual deliverable.
+
+## Step 8: build the site
+
+Check whether `walkr` is on `PATH` (`Bash`: `which walkr` or `command -v walkr`).
+
+- **Not found:** say so, and give the user the manual command
+  (`walkr build <walkthrough-dir> -o ./site`) rather than trying to install it
+  yourself.
+- **Found:** ask the user where they want the built site written (a relative path
+  is fine, e.g. `./site`; don't assume one). Then run
+  `walkr build <walkthrough-dir> -o <their answer>` via `Bash`, using the same
+  `<walkthrough-dir>` from Step 1, and report the resulting path. `walkr build`
+  output is fully self-contained static HTML (Alpine.js, Mermaid.js, and fonts all
+  embedded, plus `media/` if you captured screenshots), so mention it opens
+  straight from `file://` or from any static host, no server needed. If the user
+  instead wants to preview it live, `walkr serve <walkthrough-dir> --open` builds
+  to a temp dir and serves it, and needs no output-path decision.
