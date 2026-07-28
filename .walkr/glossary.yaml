@@ -2,7 +2,7 @@ walkr:
   term: walkr
   definition: >
     A CLI that renders a hand-authored markdown walkthrough into a static,
-    wizard-style teaching site. It never generates content itself — only
+    wizard-style teaching site. It never generates content itself, it only
     renders it.
 
 render-pipeline:
@@ -14,7 +14,7 @@ render-pipeline:
 content-format-spec:
   term: content-format spec
   definition: >
-    The single contract (docs/content-format.md) both the Go renderer and the
-    authoring skill obey — derived from what the Phase 0 prototype actually
+    The single contract (docs/ai/content-format.md) both the Go renderer and the
+    authoring skill obey, derived from what the Phase 0 prototype actually
     needed, nothing speculative.
-  learn_more: https://github.com/bashfulrobot/walkr/blob/main/docs/content-format.md
+  learn_more: https://github.com/bashfulrobot/walkr/blob/main/docs/ai/content-format.md

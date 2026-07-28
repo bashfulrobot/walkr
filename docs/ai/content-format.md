@@ -2,7 +2,7 @@
 
 This is the contract between the `walkr` renderer and anything that authors a
 walkthrough (a human, or the `walkr-author`/`walkr-tutorial-author` skills). Every key and directive below
-was derived from the Phase 0 prototype (`prototype/`) — nothing here exists that the UI
+was derived from the Phase 0 prototype (`prototype/`): nothing here exists that the UI
 doesn't render. If you're extending this format, the rule stays the same: build the UI
 interaction first, then add the frontmatter key or directive that drives it.
 
@@ -34,17 +34,17 @@ repo: walkr/walkr  # rail__repo — monospace pill, e.g. an org/repo slug
 If absent, `walkr init` seeds sensible defaults and the CLI derives `repo` from
 the target directory's git remote when it can.
 
-There is deliberately no `groups[]` key. The prototype's rail is a flat, ordered list —
-nothing in the UI groups steps into sections. Don't add that key until a UI needs it.
+There is deliberately no `groups[]` key. The prototype's rail is a flat, ordered list,
+and nothing in the UI groups steps into sections. Don't add that key until a UI needs it.
 
-`repo` is a generic subtitle string, not necessarily a repo slug — a topic-authored
+`repo` is a generic subtitle string, not necessarily a repo slug: a topic-authored
 walkthrough (no git checkout involved) can put anything short there (e.g. a source
 domain or product name). The renderer only ever displays it verbatim; it never parses
 or validates the value as a repo reference.
 
 ## Media assets
 
-`.walkr/media/` is an optional directory of author-supplied binary assets — screenshots,
+`.walkr/media/` is an optional directory of author-supplied binary assets: screenshots,
 exported diagrams, anything a step wants to embed as an image. Reference a file in it
 from a step body with a standard, directive-free image:
 
@@ -53,14 +53,14 @@ from a step body with a standard, directive-free image:
 ```
 
 Paths are relative to the walkthrough root, the same way `steps/*.md` code blocks
-resolve `path=` relative to the repository/source being explained — `media/` is just
+resolve `path=` relative to the repository/source being explained. `media/` is just
 another root-relative convention, not a new directive. Plain markdown images already
 pass through goldmark untouched, so no renderer change is needed to *render* them.
 
 At build time, `walkr build` copies `<walkthroughDir>/media/` byte-for-byte into
 `<outDir>/media/`, preserving relative paths, so `![](media/x.png)` resolves the same
 way whether the site is opened from `file://` or served. No image processing,
-resizing, or optimization happens — authors supply final-size assets. It's not an
+resizing, or optimization happens: authors supply final-size assets. It's not an
 error for `media/` to be absent; a walkthrough with no images simply gets no
 `outDir/media/` directory.
 
@@ -70,46 +70,46 @@ Each file in `steps/` is one concept. Frontmatter:
 
 | Key | Required | Consumed by |
 |---|---|---|
-| `title` | yes | `step__title`, the big heading (the `em`-wrapped word, if any, is written directly in the title string — see below) |
-| `label` | yes | the short rail item text (`itinerary__title`) — one or two words, e.g. `Overview`, `render.go`. Deliberately separate from `title`: the rail needs a short standalone word, not the full headline. |
+| `title` | yes | `step__title`, the big heading (the `em`-wrapped word, if any, is written directly in the title string, see below) |
+| `label` | yes | the short rail item text (`itinerary__title`), one or two words, e.g. `Overview`, `render.go`. Deliberately separate from `title`: the rail needs a short standalone word, not the full headline. |
 | `kind` | yes | rail item subtitle (`itinerary__kind`) *and* the eyebrow line (`Chapter 0N · {kind}`) |
 | `order` | yes | sort key across `steps/*.md`; ties break on filename |
 | `layout` | yes | picks the step template: `overview`, `code-walk`, or `config` (see below) |
 | `summary` | yes | the always-visible lede sentence (`step__lede`), one sentence, no markdown |
 
-`title` may contain a single `_em_` or `*em*` span — the renderer emits that inline
+`title` may contain a single `_em_` or `*em*` span; the renderer emits that inline
 span as `<em>` inside `step__title`, matching the prototype's amber-italic word
 (e.g. "How this repo is *wired together*").
 
 Frontmatter is plain YAML, so if `title` (or any other value) contains a literal
-`: `, quote the whole string (`title: "The render pipeline: *render.go*"`) — an
+`: `, quote the whole string (`title: "The render pipeline: *render.go*"`). An
 unquoted colon-space reads as a nested mapping and fails to parse.
 
 ### `layout: overview`
 
-Body is plain GFM prose (paragraphs, glossary spans — see Directives). Optionally
+Body is plain GFM prose (paragraphs, glossary spans, see Directives). Optionally
 followed by:
 
-- one ` ```mermaid ` fenced block — rendered into the diagram frame. Give it a `title`
+- one ` ```mermaid ` fenced block, rendered into the diagram frame. Give it a `title`
   attribute for the small pill caption (see Directives → diagrams).
-- one `:::deep{...}` block — rendered as the "Go deeper" button + modal (see Directives).
+- one `:::deep{...}` block, rendered as the "Go deeper" button + modal (see Directives).
 
 Nothing else is layout-specific; `recap`-style closing steps (prose + glossary term,
-no diagram) also use `layout: overview` — a diagram is optional, not a separate layout.
+no diagram) also use `layout: overview`. A diagram is optional, not a separate layout.
 
 ### `layout: code-walk`
 
 Body is:
 
-1. A GFM bullet list — the always-visible summary (`codewalk__summary`).
+1. A GFM bullet list, the always-visible summary (`codewalk__summary`).
 2. One fenced code block with `path` and (optionally) `mark` attributes, immediately
-   followed by one GFM ordered list — the annotated source, collapsed by default behind
+   followed by one GFM ordered list, the annotated source, collapsed by default behind
    "Show annotated source" (see Directives → annotated code).
 
 ### `layout: config`
 
 Same annotated-code-block-plus-ordered-list pairing as `code-walk` step 2, but **always
-expanded** — no summary list, no toggle. Use this for manifests/config that should read
+expanded**: no summary list, no toggle. Use this for manifests/config that should read
 top-to-bottom immediately.
 
 ## Directives
@@ -125,7 +125,7 @@ plain CommonMark/GFM (goldmark + the `github.com/yuin/goldmark/extension` GFM ta
 
 Renders the bracketed text as a dotted-underline `.term` span. `def` is looked up in
 `glossary.yaml` at build time; the definition (and optional `learn_more` URL) is baked
-directly into the page as the popover's content — there is no client-side glossary
+directly into the page as the popover's content, so there is no client-side glossary
 fetch. Hover *or* click toggles the popover (see `prototype/assets/app.js`).
 
 `glossary.yaml`:
@@ -151,7 +151,7 @@ Building this prototype on hardcoded dummy data first means...
 
 Renders a `.deepen` button reading "✎ Go deeper: {title}" that opens a modal. The block
 body is parsed as ordinary markdown (paragraphs only, in the prototype). One per step,
-maximum — the prototype only ever shows one deep-dive per step; the renderer doesn't
+maximum: the prototype only ever shows one deep-dive per step; the renderer doesn't
 enforce this, but the authoring skill should treat it as a soft rule to avoid stacking
 too much optional depth on one screen.
 
@@ -166,7 +166,7 @@ graph TB
 
 `title` becomes the small pill caption on the diagram frame (`diagram-frame__cap`). If
 omitted, the renderer falls back to `diagram.mmd`. The fenced block's body is emitted
-verbatim into a `<div class="mermaid">` — Mermaid.js (vendored, client-side) does the
+verbatim into a `<div class="mermaid">`. Mermaid.js (vendored, client-side) does the
 rendering; the Go renderer never parses or validates diagram syntax.
 
 ### Annotated code (two-level code walk / config)
@@ -187,31 +187,31 @@ func RenderStep(s *Step) (string, error) {
 3. The whole function is deliberately small.
 ```
 
-- `path` (optional) — shown in the block header (`codewalk__path`); the part before the
+- `path` (optional): shown in the block header (`codewalk__path`); the part before the
   last `/` renders dim, the filename renders bright, matching the prototype's
   `internal/render` / `render.go` split.
-- `mark=n1,n2,...` (optional) — 1-indexed source line numbers to badge. Each marked line
+- `mark=n1,n2,...` (optional): 1-indexed source line numbers to badge. Each marked line
   gets the amber left-border treatment and a numbered badge, **in the order given**.
 - The ordered list immediately following the fenced block supplies the footnote text,
   matched positionally to the `mark` list (first list item ↔ first `mark` number, etc.).
   List length must equal `mark` length or the build fails with a clear error naming the
-  step and the mismatch — this is a build-time contract check, not a silent drop.
+  step and the mismatch. This is a build-time contract check, not a silent drop.
 - If `mark` is absent, the code renders as a plain (non-annotated) highlighted block and
-  no ordered list is consumed as footnotes — a following ordered list would render as
+  no ordered list is consumed as footnotes. A following ordered list would render as
   ordinary markdown instead.
 
 Language-agnostic: `path`/`mark` work on any fenced code language (Go in the code-walk
 example, YAML in the config example). Syntax colouring is done by hand-classified spans
 today (`.kw`/`.tp`/`.st`/`.nm`/`.pn`/`.cm` in `prototype/assets/style.css`) driven by a
-small per-language classifier in the renderer — not a generic tokenizer, so new
+small per-language classifier in the renderer, not a generic tokenizer, so new
 languages need a classifier added in `internal/render` (documented there, not here).
 
 ## Source attribution (authoring convention)
 
-For a walkthrough authored from external reference material (docs, specs, help pages —
+For a walkthrough authored from external reference material (docs, specs, help pages;
 see the `walkr-tutorial-author` skill) rather than a code repository, each step should
 record which URL(s) it's drawn from, so a reader or a future re-author can verify or
-refresh it. This is a plain-markdown convention, not a directive — the renderer applies
+refresh it. This is a plain-markdown convention, not a directive; the renderer applies
 no special parsing to it, so it costs zero renderer changes.
 
 Put it as the last paragraph of the step body, after any directive blocks:
@@ -221,17 +221,17 @@ Put it as the last paragraph of the step body, after any directive blocks:
 ```
 
 Multiple sources for one step are additional links in the same italic line, comma-separated.
-This is authoring guidance, not a build-time contract — the renderer never validates or
+This is authoring guidance, not a build-time contract; the renderer never validates or
 requires it, and it's meaningless (omit it) for repo-authored walkthroughs.
 
 ## What's deliberately not in v1
 
-- No `deep_default`/`dig_deeper`/`definitions` toggle keys — the prototype never varies
+- No `deep_default`/`dig_deeper`/`definitions` toggle keys. The prototype never varies
   disclosure behavior per step; `code-walk` is always collapsed-by-default, `config` is
   always expanded, `overview`'s deep-dive is always a modal. Add a key only when a UI
   needs a *per-step* variation, not before.
 - No `group`/section headers in the rail.
-- No fetching external docs (pkg.go.dev, etc.) for glossary content — authored only.
-- No generic syntax-highlighting engine (chroma/Prism) — hand-classified spans per the
+- No fetching external docs (pkg.go.dev, etc.) for glossary content; authored only.
+- No generic syntax-highlighting engine (chroma/Prism), hand-classified spans per the
   small set of languages walkr itself needs to teach. Revisit if/when a real
   walkthrough needs a language the classifier doesn't cover.
