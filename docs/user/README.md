@@ -1,10 +1,11 @@
 # walkr user manual
 
 `walkr` turns a hand-authored markdown walkthrough into an interactive,
-wizard-style static site that teaches a newcomer how a codebase fits
-together — structure first, then code, then config, one concept per step.
-`walkr` never generates or analyzes content itself; it only renders what you
-(or the `walkr-author` skill) write.
+wizard-style static site that teaches a newcomer how something fits
+together — a codebase, or a topic sourced from docs — structure first, then
+specifics, one concept per step. `walkr` never generates or analyzes content
+itself; it only renders what you (or the `walkr-author`/`walkr-tutorial-author`
+skills) write.
 
 ## Install
 
@@ -65,6 +66,7 @@ A walkthrough is a directory (`.walkr/` by default):
 .walkr/
 ├─ walkthrough.yaml   # optional: title/tagline/repo shown in the rail header
 ├─ glossary.yaml       # hover/click term definitions
+├─ media/               # optional: screenshots/diagrams referenced from steps
 └─ steps/
    ├─ 01-overview.md
    ├─ 02-something.md
@@ -103,6 +105,9 @@ Three directives are available in the body:
   each marked line gets a numbered badge, and list item *N* is that badge's
   footnote text.
 - **Diagrams**: a plain ` ```mermaid title="name.mmd" ` fenced block.
+- **Images**: a plain `![alt](media/whatever.png)` — no directive needed. Put the
+  file under `.walkr/media/`; `walkr build` copies it byte-for-byte to
+  `outDir/media/` alongside `index.html`.
 
 **This is the quick tour, not the full contract.** For the exact, authoritative
 frontmatter keys and directive syntax — including the gotchas (quoting a
@@ -112,13 +117,24 @@ why `config` never gets a toggle) — see
 renderer and the `walkr-author` authoring skill both implement against, so it
 is always the source of truth if this manual and it ever disagree.
 
-## Using the `walkr-author` skill instead
+## Using an authoring skill instead
 
-Rather than hand-writing frontmatter, point Claude Code at a repo with the
-`walkr-author` skill (`skills/walkr-author/` in this repo; copy it into a
-target repo's `.claude/skills/walkr-author/` to use it there) and ask it to
-"author a walkr walkthrough for this repo". It analyzes the target
-repository and writes a conforming `.walkr/` directory for you.
+Rather than hand-writing frontmatter, point Claude Code at one of two portable
+skills:
+
+- **`walkr-author`** (`skills/walkr-author/`) analyzes a **code repository** and
+  writes a conforming `.walkr/` directory for it. Copy it into a target repo's
+  `.claude/skills/walkr-author/` and ask it to "author a walkr walkthrough for
+  this repo".
+- **`walkr-tutorial-author`** (`skills/walkr-tutorial-author/`) authors a
+  walkthrough for a **topic plus one or more reference URLs** instead — no
+  repository involved. It fetches and reads the linked docs, optionally
+  captures screenshots of a live tool/UI into `media/`, and attributes every
+  step to the source URL(s) it drew from. Ask it to "author a walkr tutorial
+  about `<topic>`" with links to the docs/spec/help pages to source it from.
+
+Both write to the same `.walkr/` layout and are governed by the same
+`docs/ai/content-format.md` contract.
 
 ## CLI reference
 

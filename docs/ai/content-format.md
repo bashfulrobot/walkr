@@ -1,7 +1,7 @@
 # walkr content format
 
 This is the contract between the `walkr` renderer and anything that authors a
-walkthrough (a human, or the `walkr-author` skill). Every key and directive below
+walkthrough (a human, or the `walkr-author`/`walkr-tutorial-author` skills). Every key and directive below
 was derived from the Phase 0 prototype (`prototype/`) — nothing here exists that the UI
 doesn't render. If you're extending this format, the rule stays the same: build the UI
 interaction first, then add the frontmatter key or directive that drives it.
