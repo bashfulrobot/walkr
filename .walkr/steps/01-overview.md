@@ -9,7 +9,7 @@ summary: Four moving pieces, one contract between them. Start here before touchi
 [walkr]{def=walkr} reads a folder of authored steps and turns them into the
 page you're looking at right now. The steps are plain markdown with frontmatter; a small
 [render pipeline]{def=render-pipeline} turns that into HTML; the browser side
-(Alpine + Mermaid) handles navigation, modals, and diagrams — no server required once
+(Alpine + Mermaid) handles navigation, modals, and diagrams, no server required once
 it's built.
 
 ```mermaid title="structure.mmd"
@@ -28,6 +28,6 @@ express well.
 
 Building the Phase 0 prototype on hardcoded dummy data first meant every eventual
 frontmatter key and markdown directive was derived from something a real screen
-needed — the overview diagram, the two-level code block, the annotated manifest,
+needed: the overview diagram, the two-level code block, the annotated manifest,
 the glossary popover, this very modal. Nothing speculative got added to the spec.
 :::
