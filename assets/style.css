@@ -277,6 +277,20 @@ button { font-family: inherit; }
 .prose p { margin: 0 0 18px; }
 .prose { color: var(--paper); }
 
+/* ---------- Links (source citations, learn-more, inline body links) ---------- */
+
+a {
+  color: var(--amber);
+  text-decoration: underline;
+  text-decoration-style: dashed;
+  text-decoration-thickness: 1.5px;
+  text-decoration-color: rgba(226, 163, 61, 0.55);
+  text-underline-offset: 3px;
+}
+
+a:hover { color: var(--amber-bright); text-decoration-color: var(--amber-bright); }
+a:visited { color: var(--amber-deep); }
+
 /* ---------- Glossary hover terms ---------- */
 
 .term {
