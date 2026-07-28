@@ -1,7 +1,7 @@
 # walkr content format
 
 This is the contract between the `walkr` renderer and anything that authors a
-walkthrough (a human, or the `walkr-author` skill). Every key and directive below
+walkthrough (a human, or the `walkr-author`/`walkr-tutorial-author` skills). Every key and directive below
 was derived from the Phase 0 prototype (`prototype/`) — nothing here exists that the UI
 doesn't render. If you're extending this format, the rule stays the same: build the UI
 interaction first, then add the frontmatter key or directive that drives it.
@@ -12,6 +12,7 @@ interaction first, then add the frontmatter key or directive that drives it.
 .walkr/
 ├─ walkthrough.yaml     # optional global manifest
 ├─ glossary.yaml         # hover/click term definitions
+├─ media/                # optional author-supplied binary assets (screenshots, diagrams)
 └─ steps/
    ├─ 01-overview.md
    ├─ 02-render-pipeline.md
@@ -35,6 +36,33 @@ the target directory's git remote when it can.
 
 There is deliberately no `groups[]` key. The prototype's rail is a flat, ordered list —
 nothing in the UI groups steps into sections. Don't add that key until a UI needs it.
+
+`repo` is a generic subtitle string, not necessarily a repo slug — a topic-authored
+walkthrough (no git checkout involved) can put anything short there (e.g. a source
+domain or product name). The renderer only ever displays it verbatim; it never parses
+or validates the value as a repo reference.
+
+## Media assets
+
+`.walkr/media/` is an optional directory of author-supplied binary assets — screenshots,
+exported diagrams, anything a step wants to embed as an image. Reference a file in it
+from a step body with a standard, directive-free image:
+
+```markdown
+![the login screen](media/login-screen.png)
+```
+
+Paths are relative to the walkthrough root, the same way `steps/*.md` code blocks
+resolve `path=` relative to the repository/source being explained — `media/` is just
+another root-relative convention, not a new directive. Plain markdown images already
+pass through goldmark untouched, so no renderer change is needed to *render* them.
+
+At build time, `walkr build` copies `<walkthroughDir>/media/` byte-for-byte into
+`<outDir>/media/`, preserving relative paths, so `![](media/x.png)` resolves the same
+way whether the site is opened from `file://` or served. No image processing,
+resizing, or optimization happens — authors supply final-size assets. It's not an
+error for `media/` to be absent; a walkthrough with no images simply gets no
+`outDir/media/` directory.
 
 ## Step frontmatter
 
@@ -177,6 +205,24 @@ example, YAML in the config example). Syntax colouring is done by hand-classifie
 today (`.kw`/`.tp`/`.st`/`.nm`/`.pn`/`.cm` in `prototype/assets/style.css`) driven by a
 small per-language classifier in the renderer — not a generic tokenizer, so new
 languages need a classifier added in `internal/render` (documented there, not here).
+
+## Source attribution (authoring convention)
+
+For a walkthrough authored from external reference material (docs, specs, help pages —
+see the `walkr-tutorial-author` skill) rather than a code repository, each step should
+record which URL(s) it's drawn from, so a reader or a future re-author can verify or
+refresh it. This is a plain-markdown convention, not a directive — the renderer applies
+no special parsing to it, so it costs zero renderer changes.
+
+Put it as the last paragraph of the step body, after any directive blocks:
+
+```markdown
+*Source: [RFC 8628 — OAuth 2.0 Device Authorization Grant](https://www.rfc-editor.org/rfc/rfc8628)*
+```
+
+Multiple sources for one step are additional links in the same italic line, comma-separated.
+This is authoring guidance, not a build-time contract — the renderer never validates or
+requires it, and it's meaningless (omit it) for repo-authored walkthroughs.
 
 ## What's deliberately not in v1
 

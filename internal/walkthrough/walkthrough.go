@@ -53,6 +53,7 @@ type Step struct {
 
 // Walkthrough is a fully loaded .walkr/ directory.
 type Walkthrough struct {
+	Dir      string // the directory Load read from, e.g. for resolving media/ at build time
 	Manifest Manifest
 	Glossary Glossary
 	Steps    []Step
@@ -60,7 +61,7 @@ type Walkthrough struct {
 
 // Load reads dir (a .walkr/-shaped directory) into a Walkthrough.
 func Load(dir string) (*Walkthrough, error) {
-	wt := &Walkthrough{Glossary: Glossary{}}
+	wt := &Walkthrough{Dir: dir, Glossary: Glossary{}}
 
 	if b, err := os.ReadFile(filepath.Join(dir, "walkthrough.yaml")); err == nil {
 		if err := yaml.Unmarshal(b, &wt.Manifest); err != nil {
