@@ -157,6 +157,15 @@ literal `: `; `label` and `title` must differ; one `*em*`/`_em_` span max in
 `title`; `mark=` count must exactly equal the following ordered list's item count) —
 they apply identically here since it's the same renderer contract.
 
+**Run every step's prose through `/text-polish` before writing it to disk.** This
+skill is drafting explanatory prose from source material, which is exactly the
+failure mode `/text-polish` exists to catch — hedging, filler, AI-vocabulary tells,
+rule-of-three padding. Polish the `summary` line and body paragraphs (not YAML
+keys, code blocks, or the mermaid diagram source); markdown structure and
+directives pass through untouched. Do this per step as you draft it, not as one
+pass at the end — it's cheaper to polish a paragraph once than to rewrite a whole
+walkthrough's voice after the fact.
+
 ## Teaching principles — check every step against these before moving on
 
 - **One concept per step.** If a step's `summary` needs "and," it's probably two steps.
@@ -195,6 +204,8 @@ skill's own sourcing discipline.
 - [ ] No step's prose is a bulk copy of source-doc paragraphs — everything is
       re-explained in your own words; only short verbatim snippets (code, config,
       exact field names) are quoted directly.
+- [ ] Every step's `summary` and body prose has been through `/text-polish` —
+      no hedging, filler, or AI-vocabulary tells left in.
 - [ ] Every screenshot referenced from a step lives under `media/` in the
       walkthrough directory and is referenced with a plain `![]()`, never a directive.
 - [ ] Every diagram that's *generative* (architecture/flow/state machine) is a

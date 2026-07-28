@@ -105,7 +105,15 @@ func (r *codeBlockRenderer) render(w util.BufWriter, source []byte, n ast.Node, 
 		}
 		io.WriteString(w, `<ul class="footnotes">`)
 		for i, f := range footnotes {
-			fmt.Fprintf(w, `<li><span class="mark">%d</span> %s</li>`, i+1, f)
+			// Footnote text is wrapped in one element so <li> (a 2-column CSS
+			// grid: badge + text, see .footnotes li in assets/style.css)
+			// always has exactly two element children. Without this wrapper,
+			// a footnote whose markdown contains more than one inline
+			// element (a code span, a link, emphasis) makes each its own
+			// grid item, overflowing the 2-column template and stranding the
+			// overflow in the 22px badge column — every word after the
+			// first inline element then wraps onto its own line.
+			fmt.Fprintf(w, `<li><span class="mark">%d</span><span class="footnotes__text">%s</span></li>`, i+1, f)
 		}
 		io.WriteString(w, `</ul>`)
 

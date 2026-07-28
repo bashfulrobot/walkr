@@ -270,6 +270,10 @@ func RenderStep(s *Step) (string, error) {
   means X)" inline, make it a glossary term instead.
 - **Structure before code.** The very first step is always the overview diagram; nothing
   else comes before the reader has seen the whole shape.
+- **Run prose through `/text-polish` before writing it.** Every step's `summary` and body
+  paragraphs — not YAML keys, code blocks, or diagram source — should go through
+  `/text-polish` as you draft it, so the walkthrough reads as clean human prose instead of
+  AI-slop. Do this per step, not as a single pass at the end.
 
 ## Step 6 — final self-check before declaring done
 
@@ -297,6 +301,8 @@ matters of taste, they're the build-time and parse-time contract.
       (recaps what the walkthrough covered) rather than introducing new material.
 - [ ] Nothing invents a frontmatter key or directive absent from
       `references/content-format.md`.
+- [ ] Every step's `summary` and body prose has been through `/text-polish` — no
+      hedging, filler, or AI-vocabulary tells left in.
 
 If any box fails, fix the specific file — don't rationalize the deviation, the renderer
 enforces several of these at build time and will fail loudly rather than degrade quietly.

@@ -110,6 +110,31 @@ func TestRenderStep_DeepDiveExtractedAsModal(t *testing.T) {
 	}
 }
 
+func TestRenderStep_FootnoteWithInlineElementStaysOneGridItem(t *testing.T) {
+	// Regression: .footnotes li is a 2-column CSS grid (badge + text). A
+	// footnote whose markdown contains an inline element (here, a code
+	// span) followed by more text produces 3 sibling nodes after the badge
+	// (an inline element plus a separate trailing text run) unless the
+	// footnote body is wrapped in one element. Without the wrapper, the
+	// third node overflows the 2-column grid template into the narrow
+	// badge column, forcing every word after the code span onto its own
+	// line. See codeblock.go's footnote-rendering comment for the full
+	// mechanism.
+	body := "```go mark=1\n" +
+		"line one\n" +
+		"```\n" +
+		"1. `foo` bar baz qux\n"
+	step := walkthrough.Step{ID: "footnote-inline", Layout: walkthrough.LayoutCodeWalk, Body: body}
+	res, err := RenderStep(step, walkthrough.Glossary{})
+	if err != nil {
+		t.Fatalf("RenderStep: %v", err)
+	}
+	want := `<li><span class="mark">1</span><span class="footnotes__text"><code>foo</code> bar baz qux</span></li>`
+	if !strings.Contains(res.HTML, want) {
+		t.Errorf("footnote text not wrapped in a single element:\nwant substring: %s\ngot:\n%s", want, res.HTML)
+	}
+}
+
 func TestRenderStep_MermaidBlockBecomesDiagramFrame(t *testing.T) {
 	step := walkthrough.Step{
 		ID:     "overview",
