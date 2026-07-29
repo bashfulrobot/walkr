@@ -53,6 +53,40 @@ func TestBuild_CopiesMediaDirWhenPresent(t *testing.T) {
 	}
 }
 
+func TestBuild_StepSectionsCarryStepIndexForMermaidScoping(t *testing.T) {
+	src := t.TempDir()
+	writeFile(t, filepath.Join(src, "steps", "01-overview.md"),
+		"---\ntitle: Overview\nlabel: Overview\nkind: Structure\norder: 1\nlayout: overview\nsummary: s\n---\nbody\n")
+	writeFile(t, filepath.Join(src, "steps", "02-next.md"),
+		"---\ntitle: Next\nlabel: Next\nkind: Structure\norder: 2\nlayout: overview\nsummary: s\n---\nbody\n")
+	wt, err := walkthrough.Load(src)
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+
+	out := t.TempDir()
+	if err := Build(wt, out); err != nil {
+		t.Fatalf("Build: %v", err)
+	}
+
+	got, err := os.ReadFile(filepath.Join(out, "index.html"))
+	if err != nil {
+		t.Fatalf("expected index.html in output: %v", err)
+	}
+	html := string(got)
+	// app.js scopes mermaid rendering to `section[data-step-index="N"]` so
+	// it can lazily (re)render a step's diagrams once that step is
+	// actually shown, instead of rendering every .mermaid element up
+	// front while most of them still sit under a display:none ancestor.
+	// If this attribute goes missing, that lazy render silently no-ops
+	// and diagrams past the first step render as tiny broken SVGs.
+	for _, want := range []string{`data-step-index="0"`, `data-step-index="1"`} {
+		if !strings.Contains(html, want) {
+			t.Errorf("expected %s in step section markup, got:\n%s", want, html)
+		}
+	}
+}
+
 func TestBuild_DeepDiveInlineHTMLNotDoubleEscaped(t *testing.T) {
 	src := t.TempDir()
 	writeFile(t, filepath.Join(src, "steps", "01-overview.md"),
