@@ -309,12 +309,17 @@ a:visited { color: var(--amber-deep); }
 .term__pop {
   position: absolute;
   left: 0;
-  bottom: calc(100% + 10px);
+  /* Flush against the term (no gap): a gap here is dead space the
+     pointer must cross without hovering any element, which fires
+     mouseleave on .term and closes the popup before the pointer
+     arrives. The 10px of breathing room is added as padding-bottom
+     instead, which is inside the hoverable box. */
+  bottom: 100%;
   width: 280px;
   background: var(--ink-2);
   border: 1px solid var(--rule-strong);
   border-radius: 8px;
-  padding: 14px 16px;
+  padding: 14px 16px 24px;
   box-shadow: 0 14px 34px var(--shadow);
   z-index: 30;
   font-style: normal;
