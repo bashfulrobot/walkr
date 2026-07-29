@@ -18,7 +18,7 @@ func TestRenderStep_CodeWalk_AnnotatesMarkedLines(t *testing.T) {
 		"2. second callout\n"
 
 	step := walkthrough.Step{ID: "code-walk", Layout: walkthrough.LayoutCodeWalk, Body: body}
-	res, err := RenderStep(step, walkthrough.Glossary{})
+	res, err := RenderStep(step, walkthrough.Glossary{}, nil)
 	if err != nil {
 		t.Fatalf("RenderStep: %v", err)
 	}
@@ -48,7 +48,7 @@ func TestRenderStep_Config_AlwaysExpandedNoToggle(t *testing.T) {
 		"1. two replicas because\n"
 
 	step := walkthrough.Step{ID: "config", Layout: walkthrough.LayoutConfig, Body: body}
-	res, err := RenderStep(step, walkthrough.Glossary{})
+	res, err := RenderStep(step, walkthrough.Glossary{}, nil)
 	if err != nil {
 		t.Fatalf("RenderStep: %v", err)
 	}
@@ -66,7 +66,7 @@ func TestRenderStep_MarkCountMismatchIsAnError(t *testing.T) {
 		"```\n" +
 		"1. only one callout\n"
 	step := walkthrough.Step{ID: "bad", Layout: walkthrough.LayoutCodeWalk, Body: body}
-	if _, err := RenderStep(step, walkthrough.Glossary{}); err == nil {
+	if _, err := RenderStep(step, walkthrough.Glossary{}, nil); err == nil {
 		t.Fatal("expected an error when mark= count and footnote list length disagree")
 	}
 }
@@ -76,7 +76,7 @@ func TestRenderStep_GlossaryTermExpandsFromDefinition(t *testing.T) {
 		"walkr": {Term: "walkr", Definition: "A CLI that renders authored markdown."},
 	}
 	step := walkthrough.Step{ID: "overview", Layout: walkthrough.LayoutOverview, Body: "See [walkr]{def=walkr} for details.\n"}
-	res, err := RenderStep(step, gl)
+	res, err := RenderStep(step, gl, nil)
 	if err != nil {
 		t.Fatalf("RenderStep: %v", err)
 	}
@@ -91,7 +91,7 @@ func TestRenderStep_DeepDiveExtractedAsModal(t *testing.T) {
 		Layout: walkthrough.LayoutOverview,
 		Body:   "Intro text.\n\n:::deep{title=\"Why?\"}\nBecause reasons.\n:::\n",
 	}
-	res, err := RenderStep(step, walkthrough.Glossary{})
+	res, err := RenderStep(step, walkthrough.Glossary{}, nil)
 	if err != nil {
 		t.Fatalf("RenderStep: %v", err)
 	}
@@ -125,7 +125,7 @@ func TestRenderStep_FootnoteWithInlineElementStaysOneGridItem(t *testing.T) {
 		"```\n" +
 		"1. `foo` bar baz qux\n"
 	step := walkthrough.Step{ID: "footnote-inline", Layout: walkthrough.LayoutCodeWalk, Body: body}
-	res, err := RenderStep(step, walkthrough.Glossary{})
+	res, err := RenderStep(step, walkthrough.Glossary{}, nil)
 	if err != nil {
 		t.Fatalf("RenderStep: %v", err)
 	}
@@ -135,13 +135,38 @@ func TestRenderStep_FootnoteWithInlineElementStaysOneGridItem(t *testing.T) {
 	}
 }
 
+func TestRenderStep_StepLinkExpandsToHashAnchorWhenIDKnown(t *testing.T) {
+	step := walkthrough.Step{ID: "two-paths", Layout: walkthrough.LayoutOverview, Body: "See [Minimum Path]{step=minimum-path} first.\n"}
+	res, err := RenderStep(step, walkthrough.Glossary{}, map[string]bool{"minimum-path": true})
+	if err != nil {
+		t.Fatalf("RenderStep: %v", err)
+	}
+	if !strings.Contains(res.HTML, `<a href="#minimum-path">Minimum Path</a>`) {
+		t.Errorf("expected hash anchor to known step, got:\n%s", res.HTML)
+	}
+}
+
+func TestRenderStep_StepLinkFlagsUnknownID(t *testing.T) {
+	step := walkthrough.Step{ID: "two-paths", Layout: walkthrough.LayoutOverview, Body: "See [Minimum Path]{step=no-such-step} first.\n"}
+	res, err := RenderStep(step, walkthrough.Glossary{}, map[string]bool{"minimum-path": true})
+	if err != nil {
+		t.Fatalf("RenderStep: %v", err)
+	}
+	if strings.Contains(res.HTML, `<a href="#no-such-step">`) {
+		t.Errorf("unknown step id must not render as a working link:\n%s", res.HTML)
+	}
+	if !strings.Contains(res.HTML, "undefined step link: no-such-step") {
+		t.Errorf("expected flagged span for unknown step id, got:\n%s", res.HTML)
+	}
+}
+
 func TestRenderStep_MermaidBlockBecomesDiagramFrame(t *testing.T) {
 	step := walkthrough.Step{
 		ID:     "overview",
 		Layout: walkthrough.LayoutOverview,
 		Body:   "```mermaid title=\"structure.mmd\"\ngraph TB\n  A --> B\n```\n",
 	}
-	res, err := RenderStep(step, walkthrough.Glossary{})
+	res, err := RenderStep(step, walkthrough.Glossary{}, nil)
 	if err != nil {
 		t.Fatalf("RenderStep: %v", err)
 	}

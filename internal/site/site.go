@@ -24,6 +24,7 @@ var pageTemplateSrc string
 var pageTemplate = template.Must(template.New("page").Parse(pageTemplateSrc))
 
 type stepView struct {
+	ID        string
 	ChapterNo string
 	Kind      string
 	TitleHTML template.HTML
@@ -58,9 +59,14 @@ func Build(wt *walkthrough.Walkthrough, outDir string) error {
 		Repo:    wt.Manifest.Repo,
 	}
 
+	stepIDs := make(map[string]bool, len(wt.Steps))
+	for _, step := range wt.Steps {
+		stepIDs[step.ID] = true
+	}
+
 	var rail []railStep
 	for i, step := range wt.Steps {
-		res, err := render.RenderStep(step, wt.Glossary)
+		res, err := render.RenderStep(step, wt.Glossary, stepIDs)
 		if err != nil {
 			return fmt.Errorf("step %q: %w", step.ID, err)
 		}
@@ -69,6 +75,7 @@ func Build(wt *walkthrough.Walkthrough, outDir string) error {
 			return fmt.Errorf("step %q title: %w", step.ID, err)
 		}
 		data.Steps = append(data.Steps, stepView{
+			ID:        step.ID,
 			ChapterNo: fmt.Sprintf("%02d", i+1),
 			Kind:      step.Kind,
 			TitleHTML: template.HTML(titleHTML),
