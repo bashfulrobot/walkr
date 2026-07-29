@@ -69,6 +69,26 @@ func expandGlossaryTerms(md string, gl walkthrough.Glossary) string {
 	})
 }
 
+var stepLinkRe = regexp.MustCompile(`\[([^\]]+)\]\{step=([\w-]+)\}`)
+
+// expandStepLinks replaces [text]{step=id} with a plain hash anchor to the
+// target step's <section id="id">. Clicking it is native browser hash
+// navigation, no click handler needed: assets/app.js's hashchange listener
+// picks up the resulting URL change and switches the visible step. id must
+// be a known step ID (validated against stepIDs, the full walkthrough's
+// step set); an unknown id degrades to an inert flagged span rather than
+// failing the build, matching expandGlossaryTerms' undefined-term handling.
+func expandStepLinks(md string, stepIDs map[string]bool) string {
+	return stepLinkRe.ReplaceAllStringFunc(md, func(m string) string {
+		groups := stepLinkRe.FindStringSubmatch(m)
+		text, id := groups[1], groups[2]
+		if !stepIDs[id] {
+			return fmt.Sprintf(`<span class="term" title="undefined step link: %s">%s</span>`, html.EscapeString(id), html.EscapeString(text))
+		}
+		return fmt.Sprintf(`<a href="#%s">%s</a>`, html.EscapeString(id), html.EscapeString(text))
+	})
+}
+
 var mermaidRe = regexp.MustCompile("(?m)^```mermaid(?:\\s+title=\"([^\"]*)\")?[ \\t]*\\n(?s:(.*?))\\n```[ \\t]*$")
 
 // renderMermaidBlocks replaces ```mermaid fenced blocks with the diagram

@@ -87,6 +87,66 @@ func TestBuild_StepSectionsCarryStepIndexForMermaidScoping(t *testing.T) {
 	}
 }
 
+func TestBuild_StepSectionsCarryIDForHashRouting(t *testing.T) {
+	src := t.TempDir()
+	writeFile(t, filepath.Join(src, "steps", "01-overview.md"),
+		"---\ntitle: Overview\nlabel: Overview\nkind: Structure\norder: 1\nlayout: overview\nsummary: s\n---\nbody\n")
+	writeFile(t, filepath.Join(src, "steps", "02-two-paths.md"),
+		"---\ntitle: Two Paths\nlabel: Two Paths\nkind: Structure\norder: 2\nlayout: overview\nsummary: s\n---\nbody\n")
+	wt, err := walkthrough.Load(src)
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+
+	out := t.TempDir()
+	if err := Build(wt, out); err != nil {
+		t.Fatalf("Build: %v", err)
+	}
+
+	got, err := os.ReadFile(filepath.Join(out, "index.html"))
+	if err != nil {
+		t.Fatalf("expected index.html in output: %v", err)
+	}
+	html := string(got)
+	// assets/app.js reads/writes location.hash against each step's `id`
+	// (see s.id in the rail data and the section's static id attribute) so
+	// deep-links and the browser Back/Forward buttons land on the right
+	// chapter. If the section is missing its id, hash routing silently
+	// stops working and every reload/back-navigation resets to chapter one.
+	for _, want := range []string{`id="01-overview"`, `id="02-two-paths"`} {
+		if !strings.Contains(html, want) {
+			t.Errorf("expected %s on a step section, got:\n%s", want, html)
+		}
+	}
+}
+
+func TestBuild_StepLinkDirectiveBecomesHashAnchor(t *testing.T) {
+	src := t.TempDir()
+	writeFile(t, filepath.Join(src, "steps", "01-two-paths.md"),
+		"---\ntitle: Two Paths\nlabel: Two Paths\nkind: Structure\norder: 1\nlayout: overview\nsummary: s\n---\n"+
+			"Take the [Minimum Path]{step=02-minimum-path} for a quick look.\n")
+	writeFile(t, filepath.Join(src, "steps", "02-minimum-path.md"),
+		"---\ntitle: Minimum Path\nlabel: Minimum Path\nkind: Structure\norder: 2\nlayout: overview\nsummary: s\n---\nbody\n")
+	wt, err := walkthrough.Load(src)
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+
+	out := t.TempDir()
+	if err := Build(wt, out); err != nil {
+		t.Fatalf("Build: %v", err)
+	}
+
+	got, err := os.ReadFile(filepath.Join(out, "index.html"))
+	if err != nil {
+		t.Fatalf("expected index.html in output: %v", err)
+	}
+	html := string(got)
+	if !strings.Contains(html, `<a href="#02-minimum-path">Minimum Path</a>`) {
+		t.Errorf("expected cross-chapter step link to become a hash anchor, got:\n%s", html)
+	}
+}
+
 func TestBuild_DeepDiveInlineHTMLNotDoubleEscaped(t *testing.T) {
 	src := t.TempDir()
 	writeFile(t, filepath.Join(src, "steps", "01-overview.md"),

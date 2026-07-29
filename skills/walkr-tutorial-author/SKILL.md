@@ -26,16 +26,16 @@ current repo, sometimes a scratch directory for a throwaway explainer).
 Before writing a single file, read **`references/content-format.md`**, bundled in
 this skill's own directory (next to this file), the same directory this SKILL.md
 lives in, resolved as `<this-skill>/references/content-format.md`. That file is the
-complete, locked contract for frontmatter keys, the three layouts, the four
+complete, locked contract for frontmatter keys, the three layouts, the five
 directives, the `media/` convention, and the source-attribution convention. It is
 authoritative over everything summarized below and over any prior memory of walkr's
 format, if the two ever disagree, the bundled file wins.
 
 Do not invent a frontmatter key, directive, or layout that isn't in
-`content-format.md`. The three layouts (`overview`, `code-walk`, `config`) and four
-directives (glossary term, deep-dive modal, mermaid diagram, annotated code) are
-exactly the same ones `walkr-author` uses for repos, a topic walkthrough is
-authored with the identical toolkit, just pointed at docs instead of source files.
+`content-format.md`. The three layouts (`overview`, `code-walk`, `config`) and five
+directives (glossary term, step link, deep-dive modal, mermaid diagram, annotated
+code) are exactly the same ones `walkr-author` uses for repos, a topic walkthrough
+is authored with the identical toolkit, just pointed at docs instead of source files.
 
 ## Step 1: get the topic and sources
 
@@ -127,7 +127,7 @@ are conventionally `NN-slug.md` matching `order`.
 ## Step 6: write `walkthrough.yaml`, `glossary.yaml`, and each `steps/NN-slug.md`
 
 Follow `content-format.md` exactly, frontmatter keys (`title`, `label`, `kind`,
-`order`, `layout`, `summary`), body shape per layout, and the four directives are
+`order`, `layout`, `summary`), body shape per layout, and the five directives are
 identical to what `walkr-author` produces for a repo. The only topic-specific
 differences:
 
@@ -147,6 +147,12 @@ differences:
   more than one. This is what lets a reader or future re-author verify or refresh
   the step later, don't skip it, and don't attribute a step to a URL you didn't
   actually use for that step's content.
+- **Cite the human-facing page, not the URL a lookup tool fetched.** If you sourced
+  a step through a skill that fetches an LLM-optimized variant of a page (e.g. one
+  that appends `.md` to the path, per `kong-docs-lookup`), that fetch URL is not
+  what goes in the `Source:` line, it's the raw markdown meant for an agent to
+  parse, not a page a reader should land on. Strip the fetch-only suffix/variant
+  and cite the canonical rendered page a browser would show.
 - `code-walk`/`config` steps drawn from docs rather than a real repo file should
   usually omit `path=` (there's no canonical file) unless the docs themselves name
   a real file (e.g. a Terraform `.tf` filename shown in an example), see
@@ -197,10 +203,12 @@ skill's own sourcing discipline.
 - [ ] Every fenced code block with `mark=` is immediately followed by an ordered
       list whose item count equals the count of numbers in `mark=`, in matching order.
 - [ ] Every `[text]{def=id}` has a matching top-level `id:` key in `glossary.yaml`.
+- [ ] Every `[text]{step=id}` names another step's real filename-derived ID.
 - [ ] `walkthrough.yaml` has only `title`/`tagline`/`repo`, no `groups[]`.
 - [ ] The last step is `layout: overview`, no mermaid block, closes the loop.
 - [ ] Every step ends with a `*Source: [...](...)* ` line naming the URL(s) it
-      actually drew from.
+      actually drew from, the human-facing page, never a `.md` or other
+      fetch-only variant a lookup tool used to read it.
 - [ ] No step's prose is a bulk copy of source-doc paragraphs, everything is
       re-explained in your own words; only short verbatim snippets (code, config,
       exact field names) are quoted directly.

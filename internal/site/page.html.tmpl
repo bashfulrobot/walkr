@@ -8,7 +8,7 @@
 <script src="vendor/alpine.min.js" defer></script>
 <script src="vendor/mermaid.min.js"></script>
 </head>
-<body x-data="walker()" x-init="init()" x-on:keydown.window="onKey($event)">
+<body x-data="walker()" x-init="init()" x-on:keydown.window="onKey($event)" x-on:hashchange.window="onHashChange()">
 
   <div class="shell">
     <nav class="rail">
@@ -38,7 +38,7 @@
 
     <main class="stage" :data-step-no="String(current + 1).padStart(2,'0')">
       {{range $i, $s := .Steps}}
-      <section class="step step-enter" data-step-index="{{$i}}" x-show="current === {{$i}}" x-cloak>
+      <section id="{{$s.ID}}" class="step step-enter" data-step-index="{{$i}}" x-show="current === {{$i}}" x-cloak>
         <p class="step__eyebrow">Chapter {{$s.ChapterNo}} &middot; {{$s.Kind}}</p>
         <h1 class="step__title">{{$s.TitleHTML}}</h1>
         <p class="step__lede">{{$s.Summary}}</p>

@@ -23,7 +23,7 @@ never assume it's walkr's own source.
 Before writing a single file, read **`references/content-format.md`**, bundled in this
 skill's own directory (next to this file), the same directory this SKILL.md lives in,
 resolved as `<this-skill>/references/content-format.md`. That file is the complete,
-locked contract for frontmatter keys, the three layouts, and the four directives. It is
+locked contract for frontmatter keys, the three layouts, and the five directives. It is
 authoritative over everything summarized below and over any prior memory of walkr's
 format, if the two ever disagree, the bundled file wins.
 
@@ -296,6 +296,7 @@ matters of taste, they're the build-time and parse-time contract.
       follows for unrelated prose reasons, it's clearly not meant to be read as footnotes).
 - [ ] Every `[text]{def=id}` in every step has a matching top-level `id:` key in
       `glossary.yaml`.
+- [ ] Every `[text]{step=id}` names another step's real filename-derived ID.
 - [ ] `walkthrough.yaml` has only `title`/`tagline`/`repo`, no `groups[]`.
 - [ ] The last step is `layout: overview`, has no mermaid block, and closes the loop
       (recaps what the walkthrough covered) rather than introducing new material.

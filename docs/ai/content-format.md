@@ -139,6 +139,24 @@ walkr:
   learn_more: https://github.com/bashfulrobot/walkr   # optional
 ```
 
+### Step link
+
+```markdown
+See the [Minimum Path]{step=03-minimum-path} first.
+```
+
+Renders the bracketed text as an `<a href="#id">` pointing at another step's
+`<section id="...">`. `id` is a step's filename-derived ID (see `Step frontmatter`
+below and each `steps/NN-slug.md` filename), validated at build time against every
+step in the walkthrough. Clicking it is native browser hash navigation, no
+client-side lookup or special handler: `assets/app.js` listens for `hashchange` and
+switches the visible step, and the same hash is what the reader's browser Back/
+Forward buttons and any bookmarked/shared link land on. Use it for the "chapter A
+mentions chapter B by name" cross-references a wizard-style walkthrough naturally
+wants (e.g. a "Two Paths" step naming its "Minimum Path" step). An unknown `id`
+renders as a flagged inert span instead of failing the build, matching the glossary
+term directive's undefined-term handling.
+
 ### Deep-dive modal
 
 ```markdown
@@ -223,6 +241,14 @@ Put it as the last paragraph of the step body, after any directive blocks:
 Multiple sources for one step are additional links in the same italic line, comma-separated.
 This is authoring guidance, not a build-time contract; the renderer never validates or
 requires it, and it's meaningless (omit it) for repo-authored walkthroughs.
+
+**Link the page a human would read, not the URL a research tool fetched.** Some
+docs-lookup skills fetch an LLM-optimized variant of a page (e.g. a `.md`-suffixed
+URL, an API response, a print/plain-text view) because it's cheaper to parse than
+the rendered HTML. That fetch URL is never what belongs in a `Source:` line, a
+reader who clicks it should land on the same page they'd find by browsing the
+docs site normally. Before writing the attribution, drop any such fetch-only
+suffix or variant and confirm the URL resolves to the canonical human-readable page.
 
 ## What's deliberately not in v1
 

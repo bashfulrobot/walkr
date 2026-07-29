@@ -48,15 +48,17 @@ var inlineMarkdown = goldmark.New(
 )
 
 // RenderStep converts one step's frontmatter-stripped body into HTML.
-// Directive order: deep-dive extraction, glossary expansion, diagram
-// framing (all raw-text preprocessing), then goldmark (which applies the
-// annotated-code directive via a custom node renderer). For layout
-// code-walk/config, the content before/after the annotated code block is
-// then wrapped per docs/ai/content-format.md.
-func RenderStep(step walkthrough.Step, gl walkthrough.Glossary) (*Result, error) {
+// Directive order: deep-dive extraction, glossary expansion, step-link
+// expansion, diagram framing (all raw-text preprocessing), then goldmark
+// (which applies the annotated-code directive via a custom node renderer).
+// For layout code-walk/config, the content before/after the annotated code
+// block is then wrapped per docs/ai/content-format.md. stepIDs is the set
+// of every step's ID in the walkthrough, used to validate {step=id} links.
+func RenderStep(step walkthrough.Step, gl walkthrough.Glossary, stepIDs map[string]bool) (*Result, error) {
 	md := step.Body
 	md, deeps := extractDeepDives(md, step.ID)
 	md = expandGlossaryTerms(md, gl)
+	md = expandStepLinks(md, stepIDs)
 	md = renderMermaidBlocks(md)
 
 	stepMarkdown, cbr := newStepMarkdown()

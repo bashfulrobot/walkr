@@ -12,6 +12,9 @@ document.addEventListener('alpine:init', () => {
     steps: window.__REPO_WALKER_STEPS__ || [],
 
     init() {
+      const restored = this.indexForHash();
+      if (restored !== -1) this.current = restored;
+
       if (window.mermaid) {
         window.mermaid.initialize({
           startOnLoad: false,
@@ -32,6 +35,25 @@ document.addEventListener('alpine:init', () => {
           securityLevel: 'strict',
         });
         this.renderMermaid(this.current);
+      }
+    },
+
+    // Step index matching the current #hash (a step's `id`), or -1 if the
+    // hash is empty or doesn't match a known step.
+    indexForHash() {
+      const id = (location.hash || '').slice(1);
+      if (!id) return -1;
+      return this.steps.findIndex((s) => s.id === id);
+    },
+
+    // Fires on browser Back/Forward and on cross-chapter [text]{step=id}
+    // links, which render as plain <a href="#id"> so the browser's native
+    // hash navigation lands here before we touch `current`.
+    onHashChange() {
+      const idx = this.indexForHash();
+      if (idx !== -1 && idx !== this.current) {
+        this.current = idx;
+        this.renderMermaid(idx);
       }
     },
 
@@ -81,6 +103,11 @@ document.addEventListener('alpine:init', () => {
     go(i) {
       this.current = i;
       this.renderMermaid(i);
+      // Gives every step its own browser-history entry, so Back/Forward --
+      // including returning from an external link -- lands on the chapter
+      // the reader was actually on, not always chapter one.
+      const id = this.steps[i] && this.steps[i].id;
+      if (id && location.hash.slice(1) !== id) location.hash = id;
     },
     next() {
       if (this.current < this.steps.length - 1) this.go(this.current + 1);
