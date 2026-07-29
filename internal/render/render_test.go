@@ -99,7 +99,7 @@ func TestRenderStep_DeepDiveExtractedAsModal(t *testing.T) {
 		t.Fatalf("expected 1 deep dive, got %d", len(res.DeepDives))
 	}
 	dd := res.DeepDives[0]
-	if dd.Title != "Why?" || !strings.Contains(dd.BodyHTML, "Because reasons.") {
+	if dd.Title != "Why?" || !strings.Contains(string(dd.BodyHTML), "Because reasons.") {
 		t.Errorf("unexpected deep dive: %+v", dd)
 	}
 	if !strings.Contains(res.HTML, "openModal('"+dd.ID+"')") {
