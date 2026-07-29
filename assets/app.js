@@ -31,12 +31,56 @@ document.addEventListener('alpine:init', () => {
           flowchart: { useMaxWidth: false, htmlLabels: true, curve: 'basis' },
           securityLevel: 'strict',
         });
-        window.mermaid.run({ querySelector: '.mermaid' });
+        this.renderMermaid(this.current);
+      }
+    },
+
+    // Every step's markup is present in the DOM at once (x-show just
+    // toggles display:none), but mermaid measures text with getBBox,
+    // which returns zero for anything inside a display:none ancestor.
+    // Rendering every .mermaid element up front, as mermaid.run()
+    // normally does, produces broken/tiny diagrams for every step that
+    // isn't current at that instant -- and mermaid marks each element
+    // data-processed on its first pass, so it never gets a second
+    // chance. So render each step's diagrams lazily, the first time
+    // that step is shown.
+    //
+    // mermaid.run() is also async (it lazy-loads the diagram-type
+    // renderer and yields internally), and every call is funneled
+    // through mermaid's own single global render queue -- so a render
+    // kicked off for step N can still be mid-flight after the user has
+    // already clicked past it to step N+1. If step N's <section> has
+    // gone back to display:none by then, the same zero-size bug hits.
+    // Force the section measurable (but off-flow and unpainted, so
+    // there's no visible flash) for exactly the span of its own
+    // render, then hand display back to whatever x-show wants it to be
+    // by the time the render actually finishes.
+    async renderMermaid(stepIndex) {
+      if (!window.mermaid) return;
+      const section = document.querySelector(`section[data-step-index="${stepIndex}"]`);
+      if (!section) return;
+      const nodes = Array.from(section.querySelectorAll('.mermaid:not([data-processed])'));
+      if (nodes.length === 0) return;
+      const forced = section.style.display === 'none';
+      if (forced) {
+        section.style.display = 'block';
+        section.style.position = 'absolute';
+        section.style.visibility = 'hidden';
+      }
+      try {
+        await window.mermaid.run({ nodes });
+      } finally {
+        if (forced) {
+          section.style.position = '';
+          section.style.visibility = '';
+          section.style.display = this.current === stepIndex ? '' : 'none';
+        }
       }
     },
 
     go(i) {
       this.current = i;
+      this.renderMermaid(i);
     },
     next() {
       if (this.current < this.steps.length - 1) this.go(this.current + 1);

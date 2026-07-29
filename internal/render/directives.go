@@ -3,6 +3,7 @@ package render
 import (
 	"fmt"
 	"html"
+	"html/template"
 	"regexp"
 	"strings"
 
@@ -14,7 +15,7 @@ import (
 type DeepDive struct {
 	ID       string
 	Title    string
-	BodyHTML string
+	BodyHTML template.HTML
 }
 
 var deepDiveRe = regexp.MustCompile(`(?m)^:::deep\{title="([^"]*)"\}\n(?s:(.*?))\n:::[ \t]*$`)
@@ -34,7 +35,7 @@ func extractDeepDives(md, stepID string) (string, []DeepDive) {
 		if err != nil {
 			bodyHTML = html.EscapeString(body)
 		}
-		deeps = append(deeps, DeepDive{ID: id, Title: title, BodyHTML: bodyHTML})
+		deeps = append(deeps, DeepDive{ID: id, Title: title, BodyHTML: template.HTML(bodyHTML)})
 		return fmt.Sprintf(
 			`<button class="deepen" type="button" x-on:click="openModal('%s')"><span class="deepen__glyph">&#9998;</span> Go deeper: %s</button>`,
 			id, html.EscapeString(title),
