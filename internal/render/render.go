@@ -74,6 +74,11 @@ func RenderStep(step walkthrough.Step, gl walkthrough.Glossary, stepIDs map[stri
 	case walkthrough.LayoutConfig:
 		out = wrapConfig(out)
 	}
+	// wrapCodeWalk/wrapConfig only split on the first codeBoundary, and
+	// LayoutOverview never splits at all — a step with more than one fenced
+	// code block (or an overview step with any) leaves later markers in
+	// place. Strip whatever's left so the sentinel never reaches output.
+	out = strings.ReplaceAll(out, codeBoundary, "")
 
 	return &Result{HTML: out, DeepDives: deeps}, nil
 }

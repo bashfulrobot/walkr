@@ -60,6 +60,34 @@ func TestRenderStep_Config_AlwaysExpandedNoToggle(t *testing.T) {
 	}
 }
 
+func TestRenderStep_OverviewLayoutDoesNotLeakCodeBoundary(t *testing.T) {
+	body := "Some prose.\n\n```bash\necho hi\n```\n"
+
+	step := walkthrough.Step{ID: "overview", Layout: walkthrough.LayoutOverview, Body: body}
+	res, err := RenderStep(step, walkthrough.Glossary{}, nil)
+	if err != nil {
+		t.Fatalf("RenderStep: %v", err)
+	}
+	if strings.Contains(res.HTML, "WALKR-CODE-BOUNDARY") {
+		t.Errorf("codeBoundary sentinel leaked into output:\n%s", res.HTML)
+	}
+}
+
+func TestRenderStep_MultipleCodeBlocksDoNotLeakCodeBoundary(t *testing.T) {
+	body := "```bash\necho one\n```\n\nmore prose\n\n```bash\necho two\n```\n"
+
+	for _, layout := range []walkthrough.Layout{walkthrough.LayoutCodeWalk, walkthrough.LayoutConfig} {
+		step := walkthrough.Step{ID: "multi", Layout: layout, Body: body}
+		res, err := RenderStep(step, walkthrough.Glossary{}, nil)
+		if err != nil {
+			t.Fatalf("RenderStep(%s): %v", layout, err)
+		}
+		if strings.Contains(res.HTML, "WALKR-CODE-BOUNDARY") {
+			t.Errorf("layout %s: codeBoundary sentinel leaked into output:\n%s", layout, res.HTML)
+		}
+	}
+}
+
 func TestRenderStep_MarkCountMismatchIsAnError(t *testing.T) {
 	body := "```go mark=1,2\n" +
 		"line one\n" +
