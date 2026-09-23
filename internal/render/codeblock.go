@@ -47,23 +47,12 @@ func (r *codeBlockRenderer) render(w util.BufWriter, source []byte, n ast.Node, 
 	node := n.(*ast.FencedCodeBlock)
 	lang := string(node.Language(source))
 
-	info := ""
-	if node.Info != nil {
-		info = string(node.Info.Segment.Value(source))
+	path, markNums, err := parseCodeAttrs(codeInfo(node, source))
+	if err != nil {
+		return ast.WalkStop, err
 	}
-	if m := pathAttrRe.FindStringSubmatch(info); m != nil {
-		r.Path = m[1]
-	}
-
-	var markNums []int
-	if m := markAttrRe.FindStringSubmatch(info); m != nil {
-		for _, s := range strings.Split(m[1], ",") {
-			num, err := strconv.Atoi(strings.TrimSpace(s))
-			if err != nil {
-				return ast.WalkStop, fmt.Errorf("invalid mark= attribute %q: %w", m[1], err)
-			}
-			markNums = append(markNums, num)
-		}
+	if path != "" {
+		r.Path = path
 	}
 
 	badgeForLine := map[int]int{}
@@ -88,20 +77,9 @@ func (r *codeBlockRenderer) render(w util.BufWriter, source []byte, n ast.Node, 
 	io.WriteString(w, `</code></pre>`)
 
 	if len(markNums) > 0 {
-		list, ok := node.NextSibling().(*ast.List)
-		if !ok {
-			return ast.WalkStop, fmt.Errorf("fenced code block has mark=%v but is not followed by an ordered list of footnotes", markNums)
-		}
-		var footnotes []string
-		for item := list.FirstChild(); item != nil; item = item.NextSibling() {
-			text, err := extractListItemHTML(item, source)
-			if err != nil {
-				return ast.WalkStop, err
-			}
-			footnotes = append(footnotes, text)
-		}
-		if len(footnotes) != len(markNums) {
-			return ast.WalkStop, fmt.Errorf("mark=%v names %d line(s) but the following list has %d item(s) — they must match 1:1", markNums, len(markNums), len(footnotes))
+		footnotes, err := takeFootnotes(node, source, markNums)
+		if err != nil {
+			return ast.WalkStop, err
 		}
 		io.WriteString(w, `<ul class="footnotes">`)
 		for i, f := range footnotes {
@@ -116,13 +94,60 @@ func (r *codeBlockRenderer) render(w util.BufWriter, source []byte, n ast.Node, 
 			fmt.Fprintf(w, `<li><span class="mark">%d</span><span class="footnotes__text">%s</span></li>`, i+1, f)
 		}
 		io.WriteString(w, `</ul>`)
-
-		if parent := list.Parent(); parent != nil {
-			parent.RemoveChild(parent, list)
-		}
 	}
 
 	return ast.WalkSkipChildren, nil
+}
+
+// codeInfo returns a fenced code block's info string (language plus attributes).
+func codeInfo(node *ast.FencedCodeBlock, source []byte) string {
+	if node.Info == nil {
+		return ""
+	}
+	return string(node.Info.Segment.Value(source))
+}
+
+// parseCodeAttrs reads the path= and mark= attributes off a code fence's info
+// string. Shared by every renderer so the spec's rules live in one place.
+func parseCodeAttrs(info string) (path string, marks []int, err error) {
+	if m := pathAttrRe.FindStringSubmatch(info); m != nil {
+		path = m[1]
+	}
+	if m := markAttrRe.FindStringSubmatch(info); m != nil {
+		for _, s := range strings.Split(m[1], ",") {
+			num, convErr := strconv.Atoi(strings.TrimSpace(s))
+			if convErr != nil {
+				return "", nil, fmt.Errorf("invalid mark= attribute %q: %w", m[1], convErr)
+			}
+			marks = append(marks, num)
+		}
+	}
+	return path, marks, nil
+}
+
+// takeFootnotes returns the inline HTML of the ordered list that follows an
+// annotated code block, checks it matches the mark= lines 1:1, and removes the
+// list from the tree so it is not rendered a second time.
+func takeFootnotes(node ast.Node, source []byte, marks []int) ([]string, error) {
+	list, ok := node.NextSibling().(*ast.List)
+	if !ok {
+		return nil, fmt.Errorf("fenced code block has mark=%v but is not followed by an ordered list of footnotes", marks)
+	}
+	var footnotes []string
+	for item := list.FirstChild(); item != nil; item = item.NextSibling() {
+		text, err := extractListItemHTML(item, source)
+		if err != nil {
+			return nil, err
+		}
+		footnotes = append(footnotes, text)
+	}
+	if len(footnotes) != len(marks) {
+		return nil, fmt.Errorf("mark=%v names %d line(s) but the following list has %d item(s) — they must match 1:1", marks, len(marks), len(footnotes))
+	}
+	if parent := list.Parent(); parent != nil {
+		parent.RemoveChild(parent, list)
+	}
+	return footnotes, nil
 }
 
 // hasLines matches ast.Paragraph, ast.TextBlock, etc. — leaf block nodes
