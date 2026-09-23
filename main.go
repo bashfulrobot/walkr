@@ -29,7 +29,7 @@ func rootCmd() *cobra.Command {
 		Use:   "walkr",
 		Short: "Render a hand-authored markdown walkthrough into an interactive teaching site",
 	}
-	root.AddCommand(buildCmd(), serveCmd(), initCmd())
+	root.AddCommand(buildCmd(), serveCmd(), initCmd(), confluenceCmd())
 	return root
 }
 
