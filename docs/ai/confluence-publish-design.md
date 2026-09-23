@@ -78,14 +78,14 @@ The v2 pages API is not available with these scopes, so the client uses v1 conte
 
 - Page title of a step is `<walkthrough title>: <step title with emphasis markers removed>`. Titles are unique per space, so the prefix avoids collisions.
 - Labels are walkr-<target> on every page, walkr-<target>-index on the parent, and walkr-<target>-<step id> on each step. Labels are lowercase with no spaces.
-- Body layout is eyebrow lozenges ("Chapter NN" and the step kind), a yellow lede panel from the step summary, the content, an optional Terms panel, a rule, the pager, and a small footer noting that edits are overwritten.
+- Body layout is eyebrow lozenges ("Chapter NN" and the step kind), a soft blue lede panel from the step summary, the content, an optional Terms panel, a rule, the pager, and a small footer noting that edits are overwritten.
 
 ## Element mapping
 
 | walkr | Confluence storage format |
 |---|---|
 | kind and order | Two status lozenges |
-| summary | Yellow panel macro, bold text |
+| summary | Soft blue panel macro, bold text |
 | Body prose, lists, tables | XHTML from goldmark |
 | Mermaid block | Attachment image with a caption, or the source in an expand |
 | :::deep | Expand macro titled "Go deeper: ..." |
