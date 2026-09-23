@@ -26,10 +26,17 @@ type Config struct {
 
 // Confluence is the publishing configuration.
 type Confluence struct {
+	Site    string            `yaml:"site"` // host of the Confluence site, e.g. example.atlassian.net
 	CloudID string            `yaml:"cloud_id"`
 	Email   string            `yaml:"email"`
 	Auth    Auth              `yaml:"auth"`
 	Targets map[string]Target `yaml:"targets"`
+}
+
+// PageURL is the browser URL of a page, which stays valid if the page is
+// renamed or moved.
+func (c Confluence) PageURL(id string) string {
+	return "https://" + c.Site + "/wiki/pages/viewpage.action?pageId=" + id
 }
 
 // Auth says where the API token comes from. Neither field is a secret.
@@ -110,6 +117,8 @@ func (c *Config) validate() error {
 // RequireConfluence checks the fields every Confluence command needs.
 func (c *Config) RequireConfluence() error {
 	switch {
+	case c.Confluence.Site == "":
+		return errors.New("confluence.site is not set")
 	case c.Confluence.CloudID == "":
 		return errors.New("confluence.cloud_id is not set")
 	case c.Confluence.Email == "":

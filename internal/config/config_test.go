@@ -9,6 +9,7 @@ import (
 
 const valid = `
 confluence:
+  site: example.atlassian.net
   cloud_id: 11111111-2222-3333-4444-555555555555
   email: someone@example.com
   auth:
@@ -110,5 +111,27 @@ func TestLoadRoundTripFromDisk(t *testing.T) {
 	}
 	if _, err := Load(p); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestPageURL(t *testing.T) {
+	c, err := Parse([]byte(valid), "test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := "https://example.atlassian.net/wiki/pages/viewpage.action?pageId=42"
+	if got := c.Confluence.PageURL("42"); got != want {
+		t.Fatalf("PageURL = %q, want %q", got, want)
+	}
+}
+
+func TestRequireConfluenceNeedsSite(t *testing.T) {
+	raw := strings.Replace(valid, "  site: example.atlassian.net\n", "", 1)
+	c, err := Parse([]byte(raw), "test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := c.RequireConfluence(); err == nil || !strings.Contains(err.Error(), "site") {
+		t.Fatalf("err = %v", err)
 	}
 }
