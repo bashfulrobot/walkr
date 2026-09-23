@@ -11,6 +11,7 @@ import (
 
 	"github.com/bashfulrobot/walkr/internal/config"
 	"github.com/bashfulrobot/walkr/internal/confluence"
+	"github.com/bashfulrobot/walkr/internal/diagram"
 	"github.com/bashfulrobot/walkr/internal/secrets"
 	"github.com/bashfulrobot/walkr/internal/walkthrough"
 )
@@ -128,6 +129,15 @@ func confluencePublishCmd() *cobra.Command {
 
 			pub := &confluence.Publisher{
 				Client: client, Site: cfg.Confluence, Name: target, Target: tgt, DryRun: dryRun,
+			}
+			if !dryRun && tgt.Diagrams != "source" {
+				chrome, err := diagram.NewChrome()
+				if err != nil {
+					fmt.Fprintf(cmd.ErrOrStderr(), "warning: %v, diagrams will show as source\n", err)
+				} else {
+					defer chrome.Close()
+					pub.Diagrams = chrome
+				}
 			}
 			result, err := pub.Publish(ctx, wt)
 			if err != nil {
