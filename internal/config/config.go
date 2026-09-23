@@ -52,8 +52,9 @@ type Auth struct {
 type Target struct {
 	Dir      string `yaml:"dir"`
 	SpaceKey string `yaml:"space_key"`
-	ParentID string `yaml:"parent_id"`
-	Diagrams string `yaml:"diagrams"` // "png" or "source"
+	ParentID string `yaml:"parent_id"` // where the section (or, without one, the tutorial page) goes
+	Section  string `yaml:"section"`   // optional section page, created under parent_id if absent
+	Diagrams string `yaml:"diagrams"`  // "png" or "source"
 }
 
 // DefaultPath returns $XDG_CONFIG_HOME/walkr/config.yaml, falling back to
