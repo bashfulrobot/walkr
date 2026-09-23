@@ -93,6 +93,7 @@ type PageUpdate struct {
 	Version int    // the page's current version number, as last read
 	Status  string // "current" or "draft"
 	Message string // optional version message
+	Minor   bool   // a minor edit does not notify watchers
 }
 
 // UpdatePage replaces a page's content.
@@ -107,6 +108,9 @@ func (c *Client) UpdatePage(ctx context.Context, u PageUpdate) error {
 	version := map[string]any{"number": next}
 	if u.Message != "" {
 		version["message"] = u.Message
+	}
+	if u.Minor {
+		version["minorEdit"] = true
 	}
 	payload, err := json.Marshal(map[string]any{
 		"id":      u.ID,
@@ -205,4 +209,21 @@ func (c *Client) FindByLabel(ctx context.Context, spaceKey, label string) ([]Con
 		return nil, err
 	}
 	return out.Results, nil
+}
+
+// FindByTitle returns the page with exactly this title in the space, or nil.
+// Titles are unique per space. Unlike label search this reads the content
+// store directly, so it sees a page the moment it exists.
+func (c *Client) FindByTitle(ctx context.Context, spaceKey, title string) (*Content, error) {
+	var out struct {
+		Results []Content `json:"results"`
+	}
+	q := url.Values{"spaceKey": {spaceKey}, "title": {title}, "type": {"page"}, "expand": {"version"}}
+	if err := c.get(ctx, "/content", q, &out); err != nil {
+		return nil, err
+	}
+	if len(out.Results) == 0 {
+		return nil, nil
+	}
+	return &out.Results[0], nil
 }

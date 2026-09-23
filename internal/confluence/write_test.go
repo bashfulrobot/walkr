@@ -170,3 +170,48 @@ func TestUpdatePageBumpsVersionForPublishedPages(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestFindByTitle(t *testing.T) {
+	c := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		q := r.URL.Query()
+		if r.URL.Path != "/content" || q.Get("spaceKey") != "K" || q.Get("title") != "My Page" || q.Get("type") != "page" {
+			t.Errorf("request = %s", r.URL)
+		}
+		_, _ = w.Write([]byte(`{"results":[{"id":"8","title":"My Page","status":"current","version":{"number":2}}]}`))
+	})
+	got, err := c.FindByTitle(context.Background(), "K", "My Page")
+	if err != nil || got == nil || got.ID != "8" || got.Version.Number != 2 {
+		t.Fatalf("got %+v, err %v", got, err)
+	}
+}
+
+func TestFindByTitleMissingIsNil(t *testing.T) {
+	c := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"results":[]}`))
+	})
+	got, err := c.FindByTitle(context.Background(), "K", "Nope")
+	if err != nil || got != nil {
+		t.Fatalf("got %+v, err %v", got, err)
+	}
+}
+
+func TestUpdatePageMinorEdit(t *testing.T) {
+	c := newTestClient(t, func(w http.ResponseWriter, r *http.Request) {
+		var got struct {
+			Version struct {
+				MinorEdit bool `json:"minorEdit"`
+			} `json:"version"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&got); err != nil {
+			t.Fatal(err)
+		}
+		if !got.Version.MinorEdit {
+			t.Error("minorEdit not sent")
+		}
+		_, _ = w.Write([]byte(`{}`))
+	})
+	err := c.UpdatePage(context.Background(), PageUpdate{ID: "5", Title: "T", Body: "b", Version: 1, Status: "current", Minor: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
