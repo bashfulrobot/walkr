@@ -27,6 +27,7 @@ func (f *fakeResolver) Resolve(_ context.Context, ref string) (secrets.Secret, e
 func testConfig() *config.Config {
 	c, err := config.Parse([]byte(`
 confluence:
+  site: example.atlassian.net
   cloud_id: cloud
   email: me@example.com
   auth:

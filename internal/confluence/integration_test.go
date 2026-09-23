@@ -9,6 +9,7 @@ import (
 	"image/color"
 	"image/png"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -27,7 +28,7 @@ import (
 // WALKR_IT_TARGET picks the config target (default asana-templates).
 // integrationClient builds a client from the global config, skipping the
 // test when credentials are not available.
-func integrationClient(t *testing.T) (*confluence.Client, config.Target) {
+func integrationClient(t *testing.T) (*confluence.Client, config.Target, *config.Config) {
 	t.Helper()
 	ctx := context.Background()
 
@@ -60,14 +61,14 @@ func integrationClient(t *testing.T) (*confluence.Client, config.Target) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return confluence.New(cfg.Confluence.CloudID, cfg.Confluence.Email, token), tgt
+	return confluence.New(cfg.Confluence.CloudID, cfg.Confluence.Email, token), tgt, cfg
 }
 
 // TestPageUpdateRoundTrip re-saves the target's parent page with its own body,
 // proving the token can write page content and bump the version.
 func TestPageUpdateRoundTrip(t *testing.T) {
 	ctx := context.Background()
-	c, tgt := integrationClient(t)
+	c, tgt, _ := integrationClient(t)
 
 	page, err := c.Content(ctx, tgt.ParentID)
 	if err != nil {
@@ -93,7 +94,7 @@ func TestPageUpdateRoundTrip(t *testing.T) {
 
 func TestAttachmentRoundTrip(t *testing.T) {
 	ctx := context.Background()
-	c, tgt := integrationClient(t)
+	c, tgt, _ := integrationClient(t)
 
 	const file = "walkr-api-spike.png"
 	att, err := c.PutAttachment(ctx, tgt.ParentID, file, spikePNG(t))
@@ -161,7 +162,7 @@ func spikePNG(t *testing.T) []byte {
 // leaves one new page in the target's space, delete it when done.
 func TestDraftLifecycle(t *testing.T) {
 	ctx := context.Background()
-	c, tgt := integrationClient(t)
+	c, tgt, _ := integrationClient(t)
 
 	stamp := time.Now().UTC().Format("20060102-150405")
 	label := "walkr-it-" + stamp
@@ -212,7 +213,7 @@ func TestDraftLifecycle(t *testing.T) {
 // published page in the target's space, delete it when done.
 func TestPublishedLabelSearch(t *testing.T) {
 	ctx := context.Background()
-	c, tgt := integrationClient(t)
+	c, tgt, _ := integrationClient(t)
 
 	stamp := time.Now().UTC().Format("20060102-150405")
 	label := "walkr-it-" + stamp
@@ -267,4 +268,47 @@ func TestPublishedLabelSearch(t *testing.T) {
 		t.Errorf("version = %d, want %d", after.Version.Number, created.Version.Number+1)
 	}
 	find("after update")
+}
+
+// TestRenderedGoldens publishes each RenderStorage golden file as its own page
+// so the output can be checked by eye in Confluence. It creates one published
+// page per golden in the target's space, titled "[walkr integration] render
+// <name> ...", and logs each URL. Delete them when done. Opt in with
+// WALKR_IT_RENDER=1, since it makes several pages per run.
+func TestRenderedGoldens(t *testing.T) {
+	if os.Getenv("WALKR_IT_RENDER") == "" {
+		t.Skip("set WALKR_IT_RENDER=1 to publish the golden pages")
+	}
+	ctx := context.Background()
+	c, tgt, cfg := integrationClient(t)
+
+	files, err := filepath.Glob("../render/testdata/storage/*.xml")
+	if err != nil || len(files) == 0 {
+		t.Fatalf("no golden files found: %v", err)
+	}
+	stamp := time.Now().UTC().Format("20060102-150405")
+	for _, f := range files {
+		name := strings.TrimSuffix(filepath.Base(f), ".xml")
+		body, err := os.ReadFile(f)
+		if err != nil {
+			t.Fatal(err)
+		}
+		page, err := c.CreatePage(ctx, confluence.NewPage{
+			SpaceKey: tgt.SpaceKey,
+			Title:    "[walkr integration] render " + name + " " + stamp,
+			Body:     strings.TrimSpace(string(body)),
+			Status:   "current",
+		})
+		if err != nil {
+			t.Errorf("%s: create: %v", name, err)
+			continue
+		}
+		if name == "overview-diagram-image" {
+			// The golden references this attachment name, so upload it to make the image show.
+			if _, err := c.PutAttachment(ctx, page.ID, "diagram-abc123.png", spikePNG(t)); err != nil {
+				t.Errorf("%s: attachment: %v", name, err)
+			}
+		}
+		t.Logf("%-24s %s", name, cfg.Confluence.PageURL(page.ID))
+	}
 }
