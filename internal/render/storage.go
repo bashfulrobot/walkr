@@ -394,11 +394,11 @@ func (r *storageCodeRenderer) render(w util.BufWriter, source []byte, n ast.Node
 		if err != nil {
 			return ast.WalkStop, err
 		}
-		io.WriteString(w, "<ol>")
+		io.WriteString(w, "<ul>")
 		for i, note := range notes {
 			fmt.Fprintf(w, "<li><strong>Line %d</strong>: %s</li>", marks[i], note)
 		}
-		io.WriteString(w, "</ol>")
+		io.WriteString(w, "</ul>")
 	}
 	io.WriteString(w, codeEnd)
 	return ast.WalkSkipChildren, nil
