@@ -260,3 +260,7 @@ Check whether `walkr` is on `PATH` (`Bash`: `which walkr` or `command -v walkr`)
   straight from `file://` or from any static host, no server needed. If the user
   instead wants to preview it live, `walkr serve <walkthrough-dir> --open` builds
   to a temp dir and serves it, and needs no output-path decision.
+
+## Step 9 (optional): publish to Confluence
+
+Authoring stays independent of Confluence, so do not publish as part of this skill. If the user wants the walkthrough on Confluence, point them at the `walkr-confluence-publish` skill in the `walkr` repo, which runs `walkr confluence publish` against a configured target.
