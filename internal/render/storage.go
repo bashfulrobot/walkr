@@ -58,6 +58,14 @@ const (
 	codeEnd   = "\x00WALKR-CODE-END\x00"
 )
 
+// The whole Confluence output uses one soft accent and one neutral, both from
+// Confluence's own background palette so they adapt to dark mode. Lozenges stay
+// grey and panels carry no icons, to keep the pages quiet.
+const (
+	accentBG  = "#DEEBFF" // light blue: lede and start panels
+	neutralBG = "#F4F5F7" // light gray: terms
+)
+
 var slotRe = regexp.MustCompile(`<p>@@WALKR:(\d+)@@</p>`)
 
 type storageState struct {
@@ -98,7 +106,7 @@ func RenderStorage(step walkthrough.Step, gl walkthrough.Glossary, opts StorageO
 
 	var content strings.Builder
 	content.WriteString(eyebrow(step))
-	content.WriteString(panel("panel", "#FFF0B3", ":bulb:", "<p><strong>"+esc(step.Summary)+"</strong></p>"))
+	content.WriteString(panel(accentBG, "<p><strong>"+esc(step.Summary)+"</strong></p>"))
 	content.WriteString(body)
 	content.WriteString(st.termsPanel())
 	content.WriteString("<hr />")
@@ -115,11 +123,11 @@ func RenderStorageIndex(m walkthrough.Manifest, steps []walkthrough.Step, stepUR
 	res := &StorageResult{}
 	var c strings.Builder
 	if m.Tagline != "" {
-		c.WriteString("<p>" + statusMacro(m.Tagline, "Yellow") + "</p>")
+		c.WriteString("<p>" + statusMacro(m.Tagline, "") + "</p>")
 	}
 	if len(steps) > 0 {
 		if u, ok := stepURL(steps[0].ID); ok {
-			c.WriteString(panel("panel", "#FFF0B3", ":bulb:",
+			c.WriteString(panel(accentBG,
 				`<p><strong>Start with chapter 1: </strong><a href="`+esc(u)+`">`+esc(PlainTitle(steps[0].Title))+`</a></p>`))
 		}
 	}
@@ -264,11 +272,11 @@ func (s *storageState) termsPanel() string {
 		b.WriteString("</li>")
 	}
 	b.WriteString("</ul>")
-	return macro("note", nil, b.String())
+	return panel(neutralBG, b.String())
 }
 
 func eyebrow(step walkthrough.Step) string {
-	return "<p>" + statusMacro(fmt.Sprintf("Chapter %02d", step.Order), "Yellow") + " " + statusMacro(step.Kind, "") + "</p>"
+	return "<p>" + statusMacro(fmt.Sprintf("Chapter %02d", step.Order), "") + " " + statusMacro(step.Kind, "") + "</p>"
 }
 
 func statusMacro(title, colour string) string {
@@ -289,8 +297,8 @@ func macro(name string, params [][2]string, richBody string) string {
 	return b.String()
 }
 
-func panel(name, bg, icon, richBody string) string {
-	return macro(name, [][2]string{{"panelIcon", icon}, {"bgColor", bg}}, richBody)
+func panel(bg, richBody string) string {
+	return macro("panel", [][2]string{{"bgColor", bg}}, richBody)
 }
 
 func expand(title, richBody string) string {
