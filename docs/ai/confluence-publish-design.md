@@ -1,6 +1,6 @@
 # Publishing walkr walkthroughs to Confluence
 
-Status: config, secrets, Confluence client, storage-format renderer, and the publisher are built and tested, and a real walkthrough has been published. PNG diagram rendering is not built.
+Status: config, secrets, Confluence client, storage-format renderer, the publisher, and PNG diagram rendering are built and tested, and a real walkthrough has been published with rendered diagrams.
 
 ## Goal
 
@@ -72,6 +72,7 @@ The v2 pages API is not available with these scopes, so the client uses v1 conte
 | Label search on a published page | Finds it after about 16 seconds of indexing delay, immediately after later updates |
 | Inline SVG through a data URI | Fails, stored but not displayed |
 | Publish a nine chapter walkthrough, then publish again immediately | First run creates 11 pages (section, tutorial, 9 steps). The rerun updates all 11 and creates none, inside the label indexing delay |
+| Render Mermaid to PNG with local Chrome and attach it while publishing | The stored page references the attachment and no source fallback remains. Rendering by eye is unconfirmed |
 | Label search on a draft | 0 results in an immediate query, inconclusive because of the indexing delay |
 
 ## Conventions
@@ -91,7 +92,7 @@ The v2 pages API is not available with these scopes, so the client uses v1 conte
 | :::deep | Expand macro titled "Go deeper: ..." |
 | [term]{def=id} | Bold text, definition in the Terms panel |
 | [text]{step=id} | Link to the child page URL |
-| Annotated code (path, mark) | Code macro with line numbers, then a numbered "Line N" list. In a code-walk layout both sit in an expand |
+| Annotated code (path, mark) | Code macro with line numbers, then a bulleted "Line N" list. In a code-walk layout both sit in an expand |
 | Source attribution line | Italic line with links, unchanged |
 
 Unknown step links and undefined glossary terms render as plain text and produce warnings. A mark count that does not match the footnote list is a hard error, as in the site build.
@@ -114,6 +115,7 @@ The command is `walkr confluence publish --target <name>`, with `--dry-run` to l
 | internal/secrets | Secret type and the 1Password resolver |
 | internal/config | The global config file |
 | internal/confluence | REST client, check logic, and the publisher |
+| internal/diagram | Mermaid to PNG through a local headless Chrome, using the Mermaid build embedded in walkr |
 | internal/render | RenderStorage and RenderStorageIndex, next to the site renderer, sharing its directive parsing |
 | main package | walkr confluence check and walkr confluence publish |
 
@@ -121,13 +123,13 @@ Tests use httptest and a fake resolver. RenderStorage has golden files plus a ch
 
 ## Not built yet
 
-- PNG diagram rendering with headless Chrome. Until then diagrams show as source in an expand.
 - The nix vendorHash, stale since the 1Password SDK was added to go.mod.
 - The walkr-confluence-publish skill wrapper, and pointers from walkr-author and walkr-tutorial-author.
 - A section in docs/user/README.md.
 
 ## Risks and open items
 
+- PNG rendering needs Chrome or Chromium on the machine that publishes. Without one the publisher warns and shows the source in an expand. WALKR_CHROME overrides the browser path.
 - v1 endpoints may be deprecated. Moving to v2 needs granular page scopes, and attachment upload stays on v1.
 - Code macro language names other than the mapped set fall back to plain text. Go is mapped but not confirmed to highlight.
 - The full look of a real published walkthrough has not been reviewed by eye yet. The PNG attachment and pager were confirmed on test pages.
