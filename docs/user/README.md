@@ -136,10 +136,52 @@ skills:
 Both write to the same `.walkr/` layout and are governed by the same
 `docs/ai/content-format.md` contract.
 
+## Publishing to Confluence
+
+`walkr confluence publish` turns a walkthrough into a tree of Confluence pages: an optional section page, one tutorial page, and one child page per step. Each page keeps walkr's idea of a small amount of information at a time, with a previous and next pager, a Terms panel, and diagrams rendered to PNG. It uses native Confluence elements only, so the pages follow your site's theme and dark mode.
+
+Publishing is one way. The walkthrough files are the source of truth, and a republish overwrites edits made in Confluence. Running it again updates the same pages in place, even after a step is renamed.
+
+### Configure
+
+One global file at `~/.config/walkr/config.yaml`:
+
+```yaml
+confluence:
+  site: example.atlassian.net
+  cloud_id: <site cloud id>
+  email: you@example.com
+  auth:
+    token_ref: op://<vault>/<item>/<field>     # a pointer, never the token
+  targets:
+    my-walkthrough:
+      dir: ~/path/to/.walkr
+      space_key: <space key>
+      parent_id: "<page id>"                   # where the section, or the tutorial page, goes
+      section: Tutorials                       # optional
+      diagrams: png                            # png, or source to skip rendering
+```
+
+The file never holds a secret. The parser rejects unknown keys, so a literal `token:` is an error. The Atlassian API token is resolved in memory through the 1Password SDK, using the service account token in `OP_SERVICE_ACCOUNT_TOKEN`. The API token must be a scoped token with read and write content, read space, read and write label, write attachment, and search scopes.
+
+### Run
+
+```
+walkr confluence check --target my-walkthrough             # verify credentials, read-only
+walkr confluence publish --target my-walkthrough --dry-run # show what would change
+walkr confluence publish --target my-walkthrough           # publish, prints the start URL
+```
+
+Diagram rendering needs Chrome or Chromium on the machine that publishes. Without one, diagrams show as Mermaid source in a collapsed section and the command warns. Set `WALKR_CHROME` to choose the browser.
+
+The `walkr-confluence-publish` skill wraps these steps for Claude Code. Design details are in `docs/ai/confluence-publish-design.md`.
+
 ## CLI reference
 
 ```
 walkr build [dir] [-o ./site]   # default dir: .walkr
 walkr serve [dir] [--port N] [--open]
 walkr init [dir]
+walkr confluence check --target <name>      # verify Confluence credentials
+walkr confluence publish --target <name> [--dry-run]
 ```

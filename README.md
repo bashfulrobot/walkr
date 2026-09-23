@@ -29,4 +29,5 @@ authoring reference: **[docs/user](docs/user/README.md)**.
 ## Docs
 
 - [User manual](docs/user/README.md): install, quickstart, authoring a walkthrough, CLI reference.
+- [Publishing to Confluence](docs/user/README.md#publishing-to-confluence): publish a walkthrough as native Confluence pages. Design in [docs/ai/confluence-publish-design.md](docs/ai/confluence-publish-design.md).
 - [Content format spec](docs/ai/content-format.md): the authoritative frontmatter/directive contract the renderer and both authoring skills (`walkr-author`, `walkr-tutorial-author`) implement against.

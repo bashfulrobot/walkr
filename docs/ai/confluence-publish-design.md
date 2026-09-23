@@ -123,9 +123,7 @@ Tests use httptest and a fake resolver. RenderStorage has golden files plus a ch
 
 ## Not built yet
 
-- The nix vendorHash, stale since the 1Password SDK was added to go.mod.
-- The walkr-confluence-publish skill wrapper, and pointers from walkr-author and walkr-tutorial-author.
-- A section in docs/user/README.md.
+- The nix vendorHash needs recomputing on a machine with nix, since go.mod gained the 1Password SDK and chromedp. Set `vendorHash = lib.fakeHash;` in nix/walkr.nix, run `nix build .#walkr`, and copy the hash it reports. Until then the flake build fails.
 
 ## Risks and open items
 
