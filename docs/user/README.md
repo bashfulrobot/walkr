@@ -136,6 +136,16 @@ skills:
 Both write to the same `.walkr/` layout and are governed by the same
 `docs/ai/content-format.md` contract.
 
+## Building a collection of tutorials
+
+`walkr build-all [root]` builds every walkthrough under a directory tree. A tutorial is any `.walkr/` directory that contains `steps/`. Each site is written to a `site/` folder beside its `.walkr/`, and all the sites share one copy of the vendored libraries and stylesheet in `<root>/_walkr/`. That keeps a collection of 100 tutorials at about 8 MB instead of 350 MB. Builds are deterministic, so a rebuild only changes the tutorials you edited.
+
+`site/` and `_walkr/` are generated, and every build regenerates them in full, so don't edit them by hand. One tutorial that fails to build is reported and the rest still build.
+
+`walkr build-all --check` writes nothing. It rebuilds into a temporary directory, compares the result with what is on disk, and exits non-zero if any site or the shared assets are missing, stale, or extra. Use it in CI or a git hook to stop a stale site from being committed.
+
+A shared site needs `_walkr/` to stay in the same place relative to it, so open sites from the collection, or copy the whole tree. For a fully standalone site, use `walkr build`, or pass `--per-site` to `build-all`.
+
 ## Publishing to Confluence
 
 `walkr confluence publish` turns a walkthrough into a tree of Confluence pages: an optional section page, one tutorial page, and one child page per step. Each page keeps walkr's idea of a small amount of information at a time, with a previous and next pager, a Terms panel, and diagrams rendered to PNG. It uses native Confluence elements only, so the pages follow your site's theme and dark mode.
@@ -180,6 +190,7 @@ The `walkr-confluence-publish` skill wraps these steps for Claude Code. Design d
 
 ```
 walkr build [dir] [-o ./site]   # default dir: .walkr
+walkr build-all [root] [--check] [--per-site]   # build every walkthrough under root
 walkr serve [dir] [--port N] [--open]
 walkr init [dir]
 walkr confluence check --target <name>      # verify Confluence credentials
