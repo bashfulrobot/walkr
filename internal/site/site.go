@@ -67,7 +67,7 @@ func Build(wt *walkthrough.Walkthrough, outDir string) error {
 // WriteSharedAssets writes the vendored libraries and walkr's own CSS and JS
 // into dir as vendor/ and assets/, ready to be shared by many sites.
 func WriteSharedAssets(dir string) error {
-	if err := copyEmbeddedDir(assets.Vendor, "vendor", filepath.Join(dir, "vendor")); err != nil {
+	if err := copyEmbeddedDir(assets.ThirdParty, "thirdparty", filepath.Join(dir, "vendor")); err != nil {
 		return err
 	}
 	if err := os.MkdirAll(filepath.Join(dir, "assets"), 0o755); err != nil {

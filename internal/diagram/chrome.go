@@ -110,7 +110,7 @@ func findBrowser() (string, error) {
 
 func (c *Chrome) start() error {
 	c.once.Do(func() {
-		mermaid, err := fs.ReadFile(assets.Vendor, "vendor/mermaid.min.js")
+		mermaid, err := fs.ReadFile(assets.ThirdParty, "thirdparty/mermaid.min.js")
 		if err != nil {
 			c.err = fmt.Errorf("embedded mermaid: %w", err)
 			return

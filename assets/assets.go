@@ -6,8 +6,14 @@ package assets
 
 import "embed"
 
-//go:embed all:vendor
-var Vendor embed.FS
+// ThirdParty holds the vendored libraries and fonts. It is deliberately not
+// named vendor: the Go module zip drops files nested two levels below any
+// directory called vendor, so the fonts were silently missing from binaries
+// built with go install. Built sites still write these files to a vendor/
+// folder, so their URLs are unchanged.
+//
+//go:embed all:thirdparty
+var ThirdParty embed.FS
 
 //go:embed style.css
 var StyleCSS []byte
