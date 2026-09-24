@@ -39,24 +39,57 @@ type railStep struct {
 }
 
 type pageData struct {
+	// AssetBase is the URL prefix for vendor/ and assets/: empty when they sit
+	// beside index.html, or a relative path like "../../_walkr/" when shared.
+	AssetBase            string
 	Title, Tagline, Repo string
 	Steps                []stepView
 	StepsJSON            template.JS
 	DeepDives            []render.DeepDive
 }
 
+// Options customizes a build.
+type Options struct {
+	// SharedAssets, when set, is the relative URL from the built index.html to
+	// a directory written by WriteSharedAssets, with a trailing slash, for
+	// example "../../_walkr/". The site then references vendor/ and assets/
+	// there instead of carrying its own copies.
+	SharedAssets string
+}
+
 // Build renders wt into outDir: index.html plus vendor/ and assets/ copied
 // alongside it. outDir is created if it doesn't exist; existing contents
 // are left in place except for files this call overwrites.
 func Build(wt *walkthrough.Walkthrough, outDir string) error {
+	return BuildWith(wt, outDir, Options{})
+}
+
+// WriteSharedAssets writes the vendored libraries and walkr's own CSS and JS
+// into dir as vendor/ and assets/, ready to be shared by many sites.
+func WriteSharedAssets(dir string) error {
+	if err := copyEmbeddedDir(assets.Vendor, "vendor", filepath.Join(dir, "vendor")); err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Join(dir, "assets"), 0o755); err != nil {
+		return err
+	}
+	if err := os.WriteFile(filepath.Join(dir, "assets", "style.css"), assets.StyleCSS, 0o644); err != nil {
+		return err
+	}
+	return os.WriteFile(filepath.Join(dir, "assets", "app.js"), assets.AppJS, 0o644)
+}
+
+// BuildWith is Build with options.
+func BuildWith(wt *walkthrough.Walkthrough, outDir string, opts Options) error {
 	if err := os.MkdirAll(outDir, 0o755); err != nil {
 		return err
 	}
 
 	data := pageData{
-		Title:   wt.Manifest.Title,
-		Tagline: wt.Manifest.Tagline,
-		Repo:    wt.Manifest.Repo,
+		AssetBase: opts.SharedAssets,
+		Title:     wt.Manifest.Title,
+		Tagline:   wt.Manifest.Tagline,
+		Repo:      wt.Manifest.Repo,
 	}
 
 	stepIDs := make(map[string]bool, len(wt.Steps))
@@ -101,17 +134,10 @@ func Build(wt *walkthrough.Walkthrough, outDir string) error {
 		return fmt.Errorf("rendering index.html: %w", err)
 	}
 
-	if err := copyEmbeddedDir(assets.Vendor, "vendor", filepath.Join(outDir, "vendor")); err != nil {
-		return err
-	}
-	if err := os.MkdirAll(filepath.Join(outDir, "assets"), 0o755); err != nil {
-		return err
-	}
-	if err := os.WriteFile(filepath.Join(outDir, "assets", "style.css"), assets.StyleCSS, 0o644); err != nil {
-		return err
-	}
-	if err := os.WriteFile(filepath.Join(outDir, "assets", "app.js"), assets.AppJS, 0o644); err != nil {
-		return err
+	if opts.SharedAssets == "" {
+		if err := WriteSharedAssets(outDir); err != nil {
+			return err
+		}
 	}
 
 	if err := copyMedia(wt.Dir, outDir); err != nil {
