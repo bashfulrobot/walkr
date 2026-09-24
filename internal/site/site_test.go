@@ -187,3 +187,59 @@ func TestBuild_NoMediaDirIsNotAnError(t *testing.T) {
 		t.Errorf("expected no media/ dir in output, got err=%v", err)
 	}
 }
+
+func TestBuildWith_SharedAssetsReferencesThemAndSkipsCopies(t *testing.T) {
+	wt := loadOneStepWalkthrough(t, t.TempDir())
+	out := t.TempDir()
+	if err := BuildWith(wt, out, Options{SharedAssets: "../../_walkr/"}); err != nil {
+		t.Fatalf("BuildWith: %v", err)
+	}
+	html, err := os.ReadFile(filepath.Join(out, "index.html"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, want := range []string{
+		`href="../../_walkr/assets/style.css"`,
+		`src="../../_walkr/vendor/alpine.min.js"`,
+		`src="../../_walkr/vendor/mermaid.min.js"`,
+		`src="../../_walkr/assets/app.js"`,
+	} {
+		if !strings.Contains(string(html), want) {
+			t.Errorf("index.html missing %s", want)
+		}
+	}
+	for _, dir := range []string{"vendor", "assets"} {
+		if _, err := os.Stat(filepath.Join(out, dir)); err == nil {
+			t.Errorf("%s/ was copied into a shared-assets site", dir)
+		}
+	}
+}
+
+func TestBuild_DefaultStillCarriesItsOwnAssets(t *testing.T) {
+	wt := loadOneStepWalkthrough(t, t.TempDir())
+	out := t.TempDir()
+	if err := Build(wt, out); err != nil {
+		t.Fatal(err)
+	}
+	html, _ := os.ReadFile(filepath.Join(out, "index.html"))
+	if !strings.Contains(string(html), `href="assets/style.css"`) {
+		t.Error("default build must reference assets/ beside index.html")
+	}
+	for _, f := range []string{"assets/style.css", "assets/app.js", "vendor/mermaid.min.js", "vendor/fonts.css"} {
+		if _, err := os.Stat(filepath.Join(out, f)); err != nil {
+			t.Errorf("missing %s: %v", f, err)
+		}
+	}
+}
+
+func TestWriteSharedAssets(t *testing.T) {
+	dir := t.TempDir()
+	if err := WriteSharedAssets(dir); err != nil {
+		t.Fatal(err)
+	}
+	for _, f := range []string{"assets/style.css", "assets/app.js", "vendor/alpine.min.js", "vendor/fonts.css", "vendor/fonts/fraunces-variable.woff2"} {
+		if _, err := os.Stat(filepath.Join(dir, f)); err != nil {
+			t.Errorf("missing %s: %v", f, err)
+		}
+	}
+}
