@@ -79,12 +79,12 @@ func TestBuildKongThemeAddsChromeOnly(t *testing.T) {
 	}
 	b, _ := os.ReadFile(filepath.Join(out, "index.html"))
 	html := string(b)
-	for _, want := range []string{`data-theme="kong"`, `assets/themes/kong.css`, `vendor/kong/logomark.svg`} {
+	for _, want := range []string{`data-theme="kong"`, `assets/themes/kong.css`, `vendor/kong/logotype.svg`} {
 		if !strings.Contains(html, want) {
 			t.Errorf("kong index.html lacks %q", want)
 		}
 	}
-	for _, rel := range []string{"assets/themes/kong.css", "vendor/kong/logomark.svg", "vendor/kong/fonts.css"} {
+	for _, rel := range []string{"assets/themes/kong.css", "vendor/kong/logotype.svg", "vendor/kong/fonts.css"} {
 		if _, err := os.Stat(filepath.Join(out, rel)); err != nil {
 			t.Errorf("per-site build lacks %s: %v", rel, err)
 		}

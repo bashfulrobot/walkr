@@ -33,11 +33,16 @@ document.addEventListener('alpine:init', () => {
             tertiaryColor: css('--mermaid-tertiary'),
             fontFamily: css('--mermaid-font'),
             fontSize: '15px',
+            // Mermaid's dark theme sets its own node border. A theme opts in to
+            // overriding it by defining --mermaid-node-border.
+            ...(css('--mermaid-node-border') ? { nodeBorder: css('--mermaid-node-border') } : {}),
           },
           flowchart: { useMaxWidth: false, htmlLabels: true, curve: 'basis' },
           securityLevel: 'strict',
         });
-        this.renderMermaid(this.current);
+        // Mermaid measures label text, so wait until the theme's fonts are loaded.
+        const ready = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+        ready.then(() => this.renderMermaid(this.current));
       }
     },
 

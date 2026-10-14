@@ -64,7 +64,7 @@ A walkthrough is a directory (`.walkr/` by default):
 
 ```
 .walkr/
-├─ walkthrough.yaml   # optional: title/tagline/repo shown in the rail header
+├─ walkthrough.yaml   # optional: title/tagline/repo shown in the rail header, plus theme
 ├─ glossary.yaml       # hover/click term definitions
 ├─ media/               # optional: screenshots/diagrams referenced from steps
 └─ steps/
@@ -196,3 +196,18 @@ walkr init [dir]
 walkr confluence check --target <name>      # verify Confluence credentials
 walkr confluence publish --target <name> [--dry-run]
 ```
+
+## Themes
+
+Two themes ship with walkr: `field-guide` (the default) and `kong` (Kong brand: dark
+green canvas, electric lime accent, Funnel Sans). Pick one per build:
+
+```sh
+walkr build --theme kong          # one site
+walkr build-all --theme kong      # every site under the current directory
+walkr build-all --theme kong --check
+```
+
+Or pin a site with `theme: kong` in its `walkthrough.yaml`. The flag wins over the key.
+A theme changes the page chrome only. Step content is byte-identical, so switching a
+theme is a rebuild with no edits to the walkthrough. Confluence publishing is not themed.

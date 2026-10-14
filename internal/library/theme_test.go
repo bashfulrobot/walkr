@@ -92,7 +92,7 @@ func TestPerSiteThemeCarriesItsOwnAssets(t *testing.T) {
 	if _, err := BuildAll(root, root, Options{PerSite: true}); err != nil {
 		t.Fatal(err)
 	}
-	for _, rel := range []string{"assets/themes/kong.css", "vendor/kong/logomark.svg", "vendor/kong/fonts/FunnelSans-Bold.ttf"} {
+	for _, rel := range []string{"assets/themes/kong.css", "vendor/kong/logotype.svg", "vendor/kong/fonts/FunnelSans-Bold.ttf"} {
 		if _, err := os.Stat(filepath.Join(root, "work", "site", filepath.FromSlash(rel))); err != nil {
 			t.Errorf("per-site build lacks %s: %v", rel, err)
 		}

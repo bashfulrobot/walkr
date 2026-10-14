@@ -39,7 +39,7 @@ Confluence storage output.
    block only for themes that define them. For `field-guide` the generated
    `index.html` is byte-identical to today's output.
 4. **Shared assets.** `WriteSharedAssets` always writes every theme's files:
-   `assets/themes/kong.css`, `assets/kong/logomark.svg`, and Kong fonts under
+   `assets/themes/kong.css`, `vendor/kong/logotype.svg`, and Kong fonts under
    `vendor/fonts/kong/`. One `_walkr/` directory serves a library that mixes themes.
 5. **Mermaid.** `app.js` reads `--mermaid-*` custom properties through
    `getComputedStyle` to build `themeVariables`. `app.js` holds no theme names.
@@ -55,21 +55,22 @@ Source of truth: the `kong-cs:kong-branding` skill (2026 v1.1 tokens, fonts, log
   `#858983`. Surfaces and borders from the neutral ramp (`#101110`, `#2D2E2C`,
   `#4A4D49`). Electric lime `#CCFF00` is the only accent.
 - **Accent use.** Lime marks three things: the current step in the rail, the progress
-  fill, and the keyboard focus ring. The logomark is lime by brand definition.
+  fill, and the keyboard focus ring. The logotype is lime by brand definition.
   No gradients, no second accent.
 - **Type.** Funnel Sans for headings and body (ExtraBold titles, Regular body,
   Italic where the content uses emphasis). Roboto Mono for code. Space Grotesk for
   the nav buttons only. Sentence case, no tracked all-caps labels.
 - **Layout.** Same shell and grid as `field-guide`. Flat dark canvas with no graph
-  paper and no glows. Solid neutral hairlines replace dashed leader lines. Logomark
-  at the top of the rail above the title.
+  paper and no glows. Solid neutral hairlines replace dashed leader lines. The Kong
+  logotype replaces the visible title at the top of the rail, so the rail says "Kong".
+  The walkthrough title stays in the page for screen readers and the document title.
 - **Code and diagrams.** Syntax token colors collapse to neutrals with at most one
   emphasized token color. Mermaid uses neutral fills with lime borders on primary nodes only.
 - **Focus.** Visible lime focus ring on all interactive elements. Motion respects
   `prefers-reduced-motion`.
 - **Assets.** Funnel Sans (Light omitted; Regular, Italic, Bold, ExtraBold), Roboto
   Mono (Regular, Bold), Space Grotesk (Regular, Bold) as bundled TTF, about 300 KB.
-  Logomark SVG from `assets/logos/for-dark-backgrounds/svg/Kong-Logomark.svg`. Fonts
+  Logotype SVG from `assets/logos/for-dark-backgrounds/svg/Kong-Logotype.svg`. Fonts
   carry their SIL OFL files. The logo is used unmodified. Internal Kong use needs no
   trademark disclaimer.
 

@@ -22,14 +22,20 @@ interaction first, then add the frontmatter key or directive that drives it.
 
 ## `walkthrough.yaml`
 
-Optional. Three fields, all consumed by the rail header (`rail__mark`, `rail__tag`,
-`rail__repo` in the prototype):
+Optional. Four fields. Three fill the rail header (`rail__mark`, `rail__tag`,
+`rail__repo` in the prototype). The fourth picks the page theme:
 
 ```yaml
 title: Walkr          # rail__mark — big italic wordmark, top-left
 tagline: Field Guide        # rail__tag — small caps line under the title
 repo: walkr/walkr  # rail__repo — monospace pill, e.g. an org/repo slug
+theme: kong        # optional: field-guide (default) or kong
 ```
+
+`theme` changes only the page chrome: stylesheet, fonts and logo. Step content, glossary
+and the Confluence output are identical in every theme. `walkr build --theme NAME` (also
+`build-all` and `serve`) overrides the key, so an existing site can switch theme with a
+rebuild and no edit to its files. An unknown name is a build error.
 
 If absent, `walkr init` seeds sensible defaults and the CLI derives `repo` from
 the target directory's git remote when it can.

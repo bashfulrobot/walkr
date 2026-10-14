@@ -16,13 +16,14 @@ type Theme struct {
 	// CSS is the stylesheet loaded after style.css, relative to the asset base.
 	// Empty for the default theme, which style.css already covers.
 	CSS string
-	// Logo is the rail logo, relative to the asset base. Empty means no logo.
+	// Logo is the rail brand image, relative to the asset base. When set it
+	// replaces the visible walkthrough title, which stays in the page for screen readers.
 	Logo string
 }
 
 var themes = map[string]Theme{
 	DefaultTheme: {Name: DefaultTheme},
-	"kong":       {Name: "kong", CSS: "assets/themes/kong.css", Logo: "vendor/kong/logomark.svg"},
+	"kong":       {Name: "kong", CSS: "assets/themes/kong.css", Logo: "vendor/kong/logotype.svg"},
 }
 
 // ThemeNames lists the valid theme names, sorted.

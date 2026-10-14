@@ -7,7 +7,7 @@ import (
 
 func TestKongThemeFilesAreEmbedded(t *testing.T) {
 	for _, path := range []string{
-		"thirdparty/kong/logomark.svg",
+		"thirdparty/kong/logotype.svg",
 		"thirdparty/kong/fonts.css",
 		"thirdparty/kong/fonts/FunnelSans-ExtraBold.ttf",
 		"thirdparty/kong/fonts/RobotoMono-Regular.ttf",

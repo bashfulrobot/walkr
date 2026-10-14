@@ -13,7 +13,7 @@ func TestWriteSharedAssetsCarriesEveryTheme(t *testing.T) {
 	}
 	for _, rel := range []string{
 		"assets/style.css", "assets/themes/kong.css",
-		"vendor/kong/logomark.svg", "vendor/kong/fonts.css", "vendor/kong/fonts/FunnelSans-Regular.ttf",
+		"vendor/kong/logotype.svg", "vendor/kong/fonts.css", "vendor/kong/fonts/FunnelSans-Regular.ttf",
 	} {
 		if _, err := os.Stat(filepath.Join(dir, rel)); err != nil {
 			t.Errorf("shared assets lack %s: %v", rel, err)

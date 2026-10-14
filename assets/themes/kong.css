@@ -58,6 +58,7 @@
   --mermaid-primary: #2d2e2c;
   --mermaid-text: #ffffff;
   --mermaid-border: #ccff00;
+  --mermaid-node-border: #ccff00;
   --mermaid-line: #b7bdb5;
   --mermaid-secondary: #4a4d49;
   --mermaid-tertiary: #101110;
@@ -87,15 +88,17 @@ button:focus-visible,
 
 /* ---------- Rail ---------- */
 
-.rail__brand { flex-direction: column; align-items: flex-start; gap: 16px; }
-.rail__logo { display: block; width: 44px; height: auto; }
+/* The Kong logotype is the rail brand. The walkthrough title stays in the
+   page for screen readers and the document title. */
+.rail__logo { display: block; width: 132px; height: auto; }
 
 .rail__mark {
-  font-style: normal;
-  font-weight: 800;
-  font-size: 26px;
-  letter-spacing: -0.01em;
-  color: var(--kong-white);
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .rail__tag {
