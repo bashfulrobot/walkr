@@ -34,6 +34,8 @@ type Options struct {
 	// PerSite gives every site its own copy of the assets, like walkr build,
 	// instead of one shared copy in SharedDir.
 	PerSite bool
+	// Theme overrides every site's own theme when set, like walkr build --theme.
+	Theme string
 }
 
 // Tutorial is one discovered walkthrough.
@@ -142,7 +144,7 @@ func buildOne(t Tutorial, absOut, shared string, opt Options) error {
 	if err := os.RemoveAll(siteDir); err != nil {
 		return err
 	}
-	var opts site.Options
+	opts := site.Options{Theme: opt.Theme}
 	if !opt.PerSite {
 		rel, err := filepath.Rel(siteDir, shared)
 		if err != nil {

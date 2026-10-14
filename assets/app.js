@@ -16,25 +16,33 @@ document.addEventListener('alpine:init', () => {
       if (restored !== -1) this.current = restored;
 
       if (window.mermaid) {
+        // The theme's stylesheet owns the diagram colors; read them once here.
+        const rootStyle = getComputedStyle(document.documentElement);
+        const css = (name) => rootStyle.getPropertyValue(name).trim();
         window.mermaid.initialize({
           startOnLoad: false,
           theme: 'dark',
           themeVariables: {
             darkMode: true,
-            background: '#101512',
-            primaryColor: '#171d19',
-            primaryTextColor: '#eae3d1',
-            primaryBorderColor: '#e2a33d',
-            lineColor: '#6fbdb0',
-            secondaryColor: '#232b25',
-            tertiaryColor: '#101512',
-            fontFamily: "'JetBrains Mono', monospace",
+            background: css('--mermaid-bg'),
+            primaryColor: css('--mermaid-primary'),
+            primaryTextColor: css('--mermaid-text'),
+            primaryBorderColor: css('--mermaid-border'),
+            lineColor: css('--mermaid-line'),
+            secondaryColor: css('--mermaid-secondary'),
+            tertiaryColor: css('--mermaid-tertiary'),
+            fontFamily: css('--mermaid-font'),
             fontSize: '15px',
+            // Mermaid's dark theme sets its own node border. A theme opts in to
+            // overriding it by defining --mermaid-node-border.
+            ...(css('--mermaid-node-border') ? { nodeBorder: css('--mermaid-node-border') } : {}),
           },
           flowchart: { useMaxWidth: false, htmlLabels: true, curve: 'basis' },
           securityLevel: 'strict',
         });
-        this.renderMermaid(this.current);
+        // Mermaid measures label text, so wait until the theme's fonts are loaded.
+        const ready = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+        ready.then(() => this.renderMermaid(this.current));
       }
     },
 

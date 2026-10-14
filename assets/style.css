@@ -21,6 +21,28 @@
   --rust: #c1602f;
   --shadow: rgba(0, 0, 0, 0.55);
 
+  /* Tokens a theme may override. */
+  --code-str: #c9b78a;
+  --code-num: #d68a5f;
+  --veil: rgba(6, 8, 7, 0.72);
+  --mark-wash: rgba(226, 163, 61, 0.08);
+  --amber-glow: rgba(226, 163, 61, 0.16);
+  --amber-line: rgba(226, 163, 61, 0.55);
+  --teal-line: rgba(111, 189, 176, 0.6);
+  --teal-wash: rgba(111, 189, 176, 0.05);
+  --ghost: rgba(234, 227, 209, 0.025);
+  --progress-fill: linear-gradient(90deg, var(--amber-deep), var(--amber-bright));
+
+  /* Read by app.js to build the Mermaid theme. */
+  --mermaid-bg: #101512;
+  --mermaid-primary: #171d19;
+  --mermaid-text: #eae3d1;
+  --mermaid-border: #e2a33d;
+  --mermaid-line: #6fbdb0;
+  --mermaid-secondary: #232b25;
+  --mermaid-tertiary: #101512;
+  --mermaid-font: 'JetBrains Mono', monospace;
+
   --font-display: 'Fraunces', 'Iowan Old Style', serif;
   --font-body: 'Newsreader', 'Iowan Old Style', serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
@@ -100,7 +122,7 @@ button { font-family: inherit; }
   border: 1px dashed var(--rule-strong);
   border-radius: 3px;
   padding: 8px 10px;
-  background: rgba(111, 189, 176, 0.05);
+  background: var(--teal-wash);
 }
 
 .itinerary {
@@ -174,7 +196,7 @@ button { font-family: inherit; }
   border-color: var(--amber);
   color: var(--ink-0);
   font-weight: 700;
-  box-shadow: 0 0 0 4px rgba(226, 163, 61, 0.16);
+  box-shadow: 0 0 0 4px var(--amber-glow);
 }
 
 .itinerary__item.is-active .itinerary__title { color: var(--paper); font-weight: 600; }
@@ -201,7 +223,7 @@ button { font-family: inherit; }
 
 .rail__progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--amber-deep), var(--amber-bright));
+  background: var(--progress-fill);
   transition: width 0.4s cubic-bezier(.65,0,.35,1);
 }
 
@@ -225,7 +247,7 @@ button { font-family: inherit; }
   font-weight: 900;
   font-size: 260px;
   line-height: 1;
-  color: rgba(234, 227, 209, 0.025);
+  color: var(--ghost);
   pointer-events: none;
   z-index: 0;
   user-select: none;
@@ -284,7 +306,7 @@ a {
   text-decoration: underline;
   text-decoration-style: dashed;
   text-decoration-thickness: 1.5px;
-  text-decoration-color: rgba(226, 163, 61, 0.55);
+  text-decoration-color: var(--amber-line);
   text-underline-offset: 3px;
 }
 
@@ -298,7 +320,7 @@ a:visited { color: var(--amber-deep); }
   color: var(--teal);
   text-decoration: underline;
   text-decoration-style: dotted;
-  text-decoration-color: rgba(111, 189, 176, 0.6);
+  text-decoration-color: var(--teal-line);
   text-underline-offset: 3px;
   cursor: help;
   font-style: italic;
@@ -468,7 +490,7 @@ pre.code {
 
 pre.code code { display: block; padding: 0 18px; }
 .code .ln { display: block; position: relative; white-space: pre; }
-.code .ln.is-marked { background: rgba(226, 163, 61, 0.08); border-left: 2px solid var(--amber); padding-left: 16px; margin-left: -18px; }
+.code .ln.is-marked { background: var(--mark-wash); border-left: 2px solid var(--amber); padding-left: 16px; margin-left: -18px; }
 
 .mark {
   display: inline-flex;
@@ -487,8 +509,8 @@ pre.code code { display: block; padding: 0 18px; }
 
 .kw { color: var(--teal); }
 .tp { color: var(--amber-bright); }
-.st { color: #c9b78a; }
-.nm { color: #d68a5f; }
+.st { color: var(--code-str); }
+.nm { color: var(--code-num); }
 .pn { color: var(--paper-faint); }
 .cm { color: var(--paper-faint); font-style: italic; }
 
@@ -565,7 +587,7 @@ pre.code code { display: block; padding: 0 18px; }
 .modal-veil {
   position: fixed;
   inset: 0;
-  background: rgba(6, 8, 7, 0.72);
+  background: var(--veil);
   backdrop-filter: blur(3px);
   z-index: 90;
   display: flex;

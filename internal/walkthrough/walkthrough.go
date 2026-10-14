@@ -18,6 +18,8 @@ type Manifest struct {
 	Title   string `yaml:"title"`
 	Tagline string `yaml:"tagline"`
 	Repo    string `yaml:"repo"`
+	// Theme names the page theme, see internal/site. Empty means the default.
+	Theme string `yaml:"theme"`
 }
 
 // GlossaryEntry is one glossary.yaml value.

@@ -21,6 +21,7 @@ or install locally:
 go install github.com/bashfulrobot/walkr@latest
 walkr init
 walkr build .walkr -o ./site   # self-contained static site, no server needed
+walkr build .walkr --theme kong -o ./site   # same content, Kong brand theme
 ```
 
 Full install options (Nix flake, `go install`, building from source) and

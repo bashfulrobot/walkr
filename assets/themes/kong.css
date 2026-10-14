@@ -1,0 +1,220 @@
+/* walkr Kong theme. Loads after style.css and overrides its tokens and a few
+   rules; the wizard layout and behavior are untouched.
+   Source: Kong Brand Guidelines 2026 v1.1. Dark green canvas, neutral ramp,
+   electric lime as the single accent. */
+
+@import url('../../vendor/kong/fonts.css');
+
+:root {
+  --kong-dark: #000f06;
+  --kong-lime: #ccff00;
+  --kong-white: #ffffff;
+  --kong-bay: #b7bdb5;
+  --kong-n50: #e7ede5;
+  --kong-n100: #d7ded4;
+  --kong-n400: #a1a69f;
+  --kong-n500: #858983;
+  --kong-n700: #4a4d49;
+  --kong-n800: #2d2e2c;
+  --kong-n900: #101110;
+
+  /* Surfaces and text. The names come from style.css; only values change. */
+  --ink-0: var(--kong-dark);
+  --ink-1: var(--kong-n900);
+  --ink-2: var(--kong-n800);
+  --ink-3: var(--kong-n700);
+  --rule: rgba(183, 189, 181, 0.14);
+  --rule-strong: rgba(183, 189, 181, 0.28);
+  --paper: var(--kong-white);
+  --paper-dim: var(--kong-bay);
+  --paper-faint: var(--kong-n500);
+
+  /* style.css uses amber, teal and rust for every highlight. In this theme
+     they are neutrals, and lime is applied by hand in three places below. */
+  --amber: var(--kong-n50);
+  --amber-bright: var(--kong-white);
+  --amber-deep: var(--kong-n400);
+  --teal: var(--kong-bay);
+  --rust: var(--kong-n500);
+  --shadow: rgba(0, 0, 0, 0.6);
+
+  --font-display: 'Funnel Sans', system-ui, sans-serif;
+  --font-body: 'Funnel Sans', system-ui, sans-serif;
+  --font-mono: 'Roboto Mono', ui-monospace, monospace;
+  --font-button: 'Space Grotesk', 'Funnel Sans', system-ui, sans-serif;
+
+  --code-str: var(--kong-bay);
+  --code-num: var(--kong-n100);
+  --veil: rgba(0, 15, 6, 0.8);
+  --mark-wash: rgba(255, 255, 255, 0.06);
+  --amber-glow: transparent;
+  --amber-line: rgba(183, 189, 181, 0.6);
+  --teal-line: rgba(183, 189, 181, 0.6);
+  --teal-wash: transparent;
+  --ghost: transparent;
+  --progress-fill: var(--kong-lime);
+
+  --mermaid-bg: #101110;
+  --mermaid-primary: #2d2e2c;
+  --mermaid-text: #ffffff;
+  --mermaid-border: #ccff00;
+  --mermaid-node-border: #ccff00;
+  --mermaid-line: #b7bdb5;
+  --mermaid-secondary: #4a4d49;
+  --mermaid-tertiary: #101110;
+  --mermaid-font: 'Funnel Sans', sans-serif;
+}
+
+::selection { background: var(--kong-lime); color: var(--kong-dark); }
+
+body {
+  background-image: none;
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+/* ---------- Focus: lime ring on every interactive element ---------- */
+
+a:focus-visible,
+button:focus-visible,
+.itinerary__btn:focus-visible,
+.deepen:focus-visible,
+.navbtn:focus-visible,
+.codewalk__toggle:focus-visible,
+.modal__close:focus-visible {
+  outline: 2px solid var(--kong-lime);
+  outline-offset: 3px;
+}
+
+/* ---------- Rail ---------- */
+
+/* The Kong logotype is the rail brand. The walkthrough title stays in the
+   page for screen readers and the document title. */
+.rail__logo { display: block; width: 132px; height: auto; }
+
+.rail__mark {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.rail__tag {
+  font-family: var(--font-body);
+  font-size: 14px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--paper-dim);
+}
+
+.rail__repo {
+  border-style: solid;
+  border-radius: 6px;
+  background: var(--ink-1);
+  color: var(--paper-dim);
+}
+
+.itinerary::before { background: var(--rule-strong); }
+.itinerary__num { background: var(--ink-0); }
+
+.itinerary__item.is-active .itinerary__num {
+  background: var(--kong-lime);
+  border-color: var(--kong-lime);
+  color: var(--kong-dark);
+}
+
+.itinerary__item.is-done .itinerary__num { color: var(--paper-dim); border-color: var(--paper-dim); }
+
+.itinerary__kind {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.rail__progress-fill { background: var(--kong-lime); }
+
+/* ---------- Stage ---------- */
+
+.stage::before { display: none; }
+
+.step__eyebrow {
+  font-family: var(--font-body);
+  font-size: 14px;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--paper-dim);
+}
+
+.step__eyebrow::after { display: none; }
+
+.step__title {
+  font-weight: 800;
+  font-size: 48px;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.step__title em { font-style: italic; font-weight: 400; color: inherit; }
+
+a { text-decoration-style: solid; text-decoration-thickness: 1px; color: var(--kong-white); }
+a:hover { color: var(--kong-white); text-decoration-color: var(--kong-white); }
+a:visited { color: var(--kong-bay); }
+
+.term { font-style: normal; color: var(--kong-white); }
+.term:hover, .term.is-open { color: var(--kong-white); text-decoration-color: var(--kong-white); }
+
+.term__pop-label,
+.diagram-frame__cap,
+.modal__eyebrow {
+  font-family: var(--font-body);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.term__pop-label { font-size: 12.5px; color: var(--paper-dim); }
+
+/* ---------- Buttons ---------- */
+
+.deepen,
+.navbtn { font-family: var(--font-button); }
+
+.deepen {
+  background: var(--kong-white);
+  color: var(--kong-dark);
+  border-radius: 6px;
+}
+
+.deepen:hover { background: var(--kong-n50); }
+
+.navbtn:hover:not(:disabled) { background: var(--kong-white); color: var(--kong-dark); border-color: var(--kong-white); }
+.navbtn--primary { background: var(--kong-white); color: var(--kong-dark); border-color: var(--kong-white); }
+.navbtn--primary:hover { background: var(--kong-n50); }
+
+/* ---------- Code ---------- */
+
+.codewalk__deep { border-top-style: solid; }
+.kw { color: var(--kong-white); font-weight: 700; }
+.tp { color: var(--kong-n50); }
+.cm { color: var(--kong-n500); }
+.code .ln.is-marked { border-left-color: var(--kong-white); }
+.mark { background: var(--kong-white); color: var(--kong-dark); }
+
+/* ---------- Modal ---------- */
+
+.modal::before { display: none; }
+
+.modal__title {
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+/* ---------- Motion ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .step-enter { animation: none; }
+  * { transition: none !important; }
+}

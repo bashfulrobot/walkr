@@ -14,6 +14,7 @@ const maxDiffLines = 40
 
 func buildAllCmd() *cobra.Command {
 	var perSite, check bool
+	var theme string
 	cmd := &cobra.Command{
 		Use:   "build-all [root]",
 		Short: "Build every walkthrough under a directory tree, sharing one copy of the assets",
@@ -33,7 +34,10 @@ func buildAllCmd() *cobra.Command {
 			if len(args) == 1 {
 				root = args[0]
 			}
-			opt := library.Options{PerSite: perSite}
+			if err := checkTheme(theme); err != nil {
+				return err
+			}
+			opt := library.Options{PerSite: perSite, Theme: theme}
 			if check {
 				return runCheck(cmd, root, opt)
 			}
@@ -42,6 +46,7 @@ func buildAllCmd() *cobra.Command {
 	}
 	cmd.Flags().BoolVar(&perSite, "per-site", false, "give every site its own copy of the assets")
 	cmd.Flags().BoolVar(&check, "check", false, "write nothing, fail if any committed site is out of date")
+	cmd.Flags().StringVar(&theme, "theme", "", themeFlagHelp)
 	return cmd
 }
 

@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Walkr &mdash; walkthrough</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="stylesheet" href="assets/style.css" />
+<script src="vendor/alpine.min.js" defer></script>
+<script src="vendor/mermaid.min.js"></script>
+</head>
+<body x-data="walker()" x-init="init()" x-on:keydown.window="onKey($event)" x-on:hashchange.window="onHashChange()">
+
+  <div class="shell">
+    <nav class="rail">
+      <div class="rail__brand"><span class="rail__mark">Walkr</span></div>
+      <div class="rail__tag">Field Guide</div>
+      <div class="rail__repo">$ bashfulrobot/walkr</div>
+
+      <ol class="itinerary">
+        <template x-for="(s, i) in steps" :key="s.id">
+          <li class="itinerary__item" :class="{ 'is-active': i === current, 'is-done': i < current }">
+            <span class="itinerary__num" x-text="i < current ? '&check;' : String(i + 1).padStart(2,'0')"></span>
+            <button class="itinerary__btn" type="button" x-on:click="go(i)">
+              <span class="itinerary__title" x-text="s.title"></span>
+              <span class="itinerary__kind" x-text="s.kind"></span>
+            </button>
+          </li>
+        </template>
+      </ol>
+
+      <div class="rail__progress">
+        <span x-text="`${current + 1} / ${steps.length}`"></span>
+        <span class="rail__progress-bar"><span class="rail__progress-fill" :style="`width: ${((current+1)/steps.length)*100}%`"></span></span>
+      </div>
+    </nav>
+
+    <div class="divider"></div>
+
+    <main class="stage" :data-step-no="String(current + 1).padStart(2,'0')">
+      
+      <section id="01-overview" class="step step-enter" data-step-index="0" x-show="current === 0" x-cloak>
+        <p class="step__eyebrow">Chapter 01 &middot; Structure</p>
+        <h1 class="step__title">How this repo is <em>wired together</em></h1>
+        <p class="step__lede">Four moving pieces, one contract between them. Start here before touching any code.</p>
+        <div class="prose"><p><span class="term" x-data="{ open: false }" x-on:mouseenter="open = true" x-on:mouseleave="open = false" x-on:click="open = !open">walkr<template x-if="open"><span class="term__pop" x-cloak><span class="term__pop-label">Definition</span><span class="term__pop-def">A CLI that renders a hand-authored markdown walkthrough into a static, wizard-style teaching site. It never generates content itself, it only renders it.</span></span></template></span> reads a folder of authored steps and turns them into the
+page you're looking at right now. The steps are plain markdown with frontmatter; a small
+<span class="term" x-data="{ open: false }" x-on:mouseenter="open = true" x-on:mouseleave="open = false" x-on:click="open = !open">render pipeline<template x-if="open"><span class="term__pop" x-cloak><span class="term__pop-label">Definition</span><span class="term__pop-def">The goldmark-based Go code (internal/render) that parses a step's frontmatter and body, then emits the HTML fragment the wizard swaps in.</span></span></template></span> turns that into HTML; the browser side
+(Alpine + Mermaid) handles navigation, modals, and diagrams, no server required once
+it's built.</p>
+<div class="diagram-frame"><span class="diagram-frame__cap">structure.mmd</span><div class="mermaid">graph TB
+  F[&#34;walkr-author&lt;br/&gt;skill&#34;] --&gt;|writes| A[&#34;.walkr/&lt;br/&gt;steps&#34;]
+  A --&gt;|parsed by| B[&#34;render pipeline&lt;br/&gt;(goldmark)&#34;]
+  B --&gt;|emits| C[&#34;index.html&lt;br/&gt;+ fragments&#34;]
+  C --&gt;|hydrated by| D[&#34;Alpine.js&lt;br/&gt;wizard&#34;]
+  D --&gt;|renders diagrams via| E[&#34;Mermaid.js&#34;]</div></div>
+<p><button class="deepen" type="button" x-on:click="openModal('01-overview-deep-1')"><span class="deepen__glyph">✎</span> Go deeper: Why build the UI before the format?</button></p>
+</div>
+      </section>
+      
+      <section id="02-render-pipeline" class="step step-enter" data-step-index="1" x-show="current === 1" x-cloak>
+        <p class="step__eyebrow">Chapter 02 &middot; Code walk</p>
+        <h1 class="step__title">The render pipeline: <em>render.go</em></h1>
+        <p class="step__lede">One file turns an authored step into HTML. Read the summary first, expand only if you want the annotated source.</p>
+        <div class="prose"><div class="codewalk"><div class="codewalk__head"><span class="codewalk__path"><span class="dim">internal/render/</span>render.go</span><button class="codewalk__toggle" type="button" x-on:click="codeOpen['02-render-pipeline'] = !codeOpen['02-render-pipeline']"><span class="codewalk__toggle-chev" :class="{ 'is-open': codeOpen['02-render-pipeline'] }">&#9656;</span><span x-text="codeOpen['02-render-pipeline'] ? 'Hide annotated source' : 'Show annotated source'"></span></button></div><div class="codewalk__summary"><ul>
+<li>Reads a step's YAML frontmatter to pick a template (<code>overview</code>, <code>code-walk</code>, <code>config</code>).</li>
+<li>Parses the markdown body with goldmark, resolving custom directives (deep-dive, glossary terms, two-level code).</li>
+<li>Returns a rendered HTML fragment the site assembler embeds into <code>index.html</code>.</li>
+</ul>
+</div><div class="codewalk__deep" x-show="codeOpen['02-render-pipeline']" x-cloak x-transition><pre class="code"><code><span class="ln"><span class="kw">func</span> <span class="tp">RenderStep</span>(s *<span class="tp">Step</span>) (<span class="tp">string</span>, <span class="tp">error</span>) {</span>
+<span class="ln is-marked">    fm, body := splitFrontmatter(s.<span class="tp">Raw</span>)<span class="mark">1</span></span>
+<span class="ln">    tmpl, err := templateFor(fm.<span class="tp">Layout</span>)</span>
+<span class="ln">    <span class="kw">if</span> err != <span class="kw">nil</span> { <span class="kw">return</span> <span class="st">&#34;&#34;</span>, err }</span>
+<span class="ln is-marked">    html := goldmark.<span class="tp">Convert</span>(body, <span class="tp">WithDirectives</span>())<span class="mark">2</span></span>
+<span class="ln">    <span class="kw">return</span> tmpl.<span class="tp">Exec</span>(fm, html)</span>
+<span class="ln is-marked">} <span class="cm">// one concept per step — no walls of text</span><span class="mark">3</span></span>
+</code></pre><ul class="footnotes"><li><span class="mark">1</span><span class="footnotes__text">Frontmatter is parsed before the body, deciding the template and disclosure defaults before a single word of markdown is touched.</span></li><li><span class="mark">2</span><span class="footnotes__text">Custom directives (<code>:::deep</code>, glossary spans, two-level code fences) are goldmark extensions, not a second parser.</span></li><li><span class="mark">3</span><span class="footnotes__text">The whole function is deliberately small, the enforcement point for &quot;never a wall of text.&quot;</span></li></ul></div></div></div>
+      </section>
+      
+      <section id="03-deployment" class="step step-enter" data-step-index="2" x-show="current === 2" x-cloak>
+        <p class="step__eyebrow">Chapter 03 &middot; Config</p>
+        <h1 class="step__title">Deploying it: the <em>k8s manifest</em></h1>
+        <p class="step__lede">Config gets the same treatment as code, annotated inline, not left to speak for itself.</p>
+        <div class="prose"><div class="manifest"><pre class="code"><code><span class="ln"><span class="kw">apiVersion</span>: <span class="st">apps/v1</span></span>
+<span class="ln"><span class="kw">kind</span>: <span class="st">Deployment</span></span>
+<span class="ln"><span class="kw">spec</span>:</span>
+<span class="ln is-marked">  <span class="kw">replicas</span>: <span class="nm">2</span><span class="mark">1</span></span>
+<span class="ln">  <span class="kw">template</span>:</span>
+<span class="ln">    <span class="kw">spec</span>:</span>
+<span class="ln">      <span class="kw">containers</span>:</span>
+<span class="ln">        - <span class="kw">name</span>: <span class="st">walkr</span></span>
+<span class="ln is-marked">          <span class="kw">readinessProbe</span>:<span class="mark">2</span></span>
+<span class="ln">            <span class="kw">httpGet</span>: <span class="pn">{</span> <span class="kw">path</span><span class="pn">:</span> <span class="st">/healthz</span><span class="pn">,</span> <span class="kw">port</span><span class="pn">:</span> <span class="nm">8080</span> <span class="pn">}</span></span>
+<span class="ln is-marked">          <span class="kw">resources</span>:<span class="mark">3</span></span>
+<span class="ln">            <span class="kw">limits</span>: <span class="pn">{</span> <span class="kw">cpu</span><span class="pn">:</span> <span class="st">&#34;200m&#34;</span><span class="pn">,</span> <span class="kw">memory</span><span class="pn">:</span> <span class="st">&#34;128Mi&#34;</span> <span class="pn">}</span></span>
+</code></pre><ul class="footnotes"><li><span class="mark">1</span><span class="footnotes__text">Two replicas, since this is a static-site server: redundancy is cheap and mostly guards against node drain.</span></li><li><span class="mark">2</span><span class="footnotes__text">Without this, a slow-starting pod can receive traffic before the site is built and served.</span></li><li><span class="mark">3</span><span class="footnotes__text">Deliberately tight: the binary embeds all assets, so there's no separate asset-serving footprint to budget for.</span></li></ul></div></div>
+      </section>
+      
+      <section id="04-recap" class="step step-enter" data-step-index="3" x-show="current === 3" x-cloak>
+        <p class="step__eyebrow">Chapter 04 &middot; Summary</p>
+        <h1 class="step__title">You've seen <em>the whole loop</em></h1>
+        <p class="step__lede">Structure → code → config. The same four interactions repeat for every subsystem in a real walkthrough.</p>
+        <div class="prose"><p>Every subsystem in a real walkthrough gets the same treatment: an overview diagram,
+two-level code, annotated config, glossary terms, and deep-dives where the reasoning
+needs more room than a paragraph.</p>
+<p>Everything in this walkthrough is now generated from plain markdown: every frontmatter
+key and directive here is written down as the <span class="term" x-data="{ open: false }" x-on:mouseenter="open = true" x-on:mouseleave="open = false" x-on:click="open = !open">content-format spec<template x-if="open"><span class="term__pop" x-cloak><span class="term__pop-label">Definition</span><span class="term__pop-def">The single contract (docs/ai/content-format.md) both the Go renderer and the authoring skill obey, derived from what the Phase 0 prototype actually needed, nothing speculative.</span><a class="term__pop-more" href="https://github.com/bashfulrobot/walkr/blob/main/docs/ai/content-format.md" target="_blank" rel="noopener">Learn more →</a></span></template></span>,
+and this page itself is proof the renderer reproduces the Phase 0 prototype from authored
+content, not hardcoded HTML.</p>
+</div>
+      </section>
+      
+    </main>
+  </div>
+
+  <div class="navbar">
+    <span class="navbar__hint">&larr; / &rarr;</span>
+    <button class="navbtn" type="button" x-on:click="prev()" :disabled="current === 0" aria-label="Previous step">&lsaquo;</button>
+    <button class="navbtn navbtn--primary" type="button" x-on:click="next()" :disabled="current === steps.length - 1" aria-label="Next step">&rsaquo;</button>
+  </div>
+
+  <div class="modal-veil" x-show="modal" x-cloak x-on:click.self="closeModal()" x-on:keydown.escape.window="closeModal()">
+    <div class="modal" x-show="modal" x-transition>
+      <button class="modal__close" type="button" x-on:click="closeModal()">&#10005; close</button>
+      
+      <template x-if="modal === '01-overview-deep-1'">
+        <div>
+          <p class="modal__eyebrow">Go deeper</p>
+          <h2 class="modal__title">Why build the UI before the format?</h2>
+          <div class="modal__body"><p>It's tempting to design frontmatter keys and directive syntax on paper first. In
+practice that produces fields nothing renders and directives the UI can't actually
+express well.</p>
+<p>Building the Phase 0 prototype on hardcoded dummy data first meant every eventual
+frontmatter key and markdown directive was derived from something a real screen
+needed: the overview diagram, the two-level code block, the annotated manifest,
+the glossary popover, this very modal. Nothing speculative got added to the spec.</p></div>
+        </div>
+      </template>
+      
+    </div>
+  </div>
+
+  <script>window.__REPO_WALKER_STEPS__ = [{"id":"01-overview","title":"Overview","kind":"Structure"},{"id":"02-render-pipeline","title":"render.go","kind":"Code walk"},{"id":"03-deployment","title":"Deployment","kind":"Config"},{"id":"04-recap","title":"Recap","kind":"Summary"}];</script>
+  <script src="assets/app.js"></script>
+</body>
+</html>

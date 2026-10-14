@@ -20,3 +20,8 @@ var StyleCSS []byte
 
 //go:embed app.js
 var AppJS []byte
+
+// Themes holds the stylesheets of the non-default themes.
+//
+//go:embed themes
+var Themes embed.FS
