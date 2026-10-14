@@ -12,10 +12,14 @@ serve:
 test:
     go test ./...
 
-# Vet the code and check formatting
+# Vet the code and check formatting (fails when gofmt lists any file)
 lint:
     go vet ./...
-    gofmt -l .
+    test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
+
+# Full pre-merge gate: lint, tests, and a dogfood build of .walkr
+check: lint test
+    out="$(mktemp -d)" && go run . build .walkr -o "$out" && test -f "$out/index.html" && rm -rf "$out"
 
 # Build the .walkr walkthrough to ./site for a quick look
 demo:

@@ -4,13 +4,19 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"runtime"
 	"strings"
+	"syscall"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -73,6 +79,28 @@ func buildCmd() *cobra.Command {
 	return cmd
 }
 
+// serveDir serves dir on ln until ctx is cancelled, then shuts the server down
+// so the caller can remove dir. A clean shutdown returns nil.
+func serveDir(ctx context.Context, ln net.Listener, dir string) error {
+	srv := &http.Server{Handler: http.FileServer(http.Dir(dir))}
+	errc := make(chan error, 1)
+	go func() { errc <- srv.Serve(ln) }()
+	select {
+	case err := <-errc:
+		return err
+	case <-ctx.Done():
+	}
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		return err
+	}
+	if err := <-errc; !errors.Is(err, http.ErrServerClosed) {
+		return err
+	}
+	return nil
+}
+
 func serveCmd() *cobra.Command {
 	var port int
 	var open bool
@@ -97,16 +125,23 @@ func serveCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			defer os.RemoveAll(tmp)
 			if err := site.BuildWith(wt, tmp, site.Options{Theme: theme}); err != nil {
 				return err
 			}
 			addr := fmt.Sprintf("127.0.0.1:%d", port)
+			ln, err := net.Listen("tcp", addr)
+			if err != nil {
+				return err
+			}
 			url := "http://" + addr + "/"
 			fmt.Printf("serving %s at %s (ctrl-c to stop)\n", tmp, url)
 			if open {
 				go openBrowser(url)
 			}
-			return http.ListenAndServe(addr, http.FileServer(http.Dir(tmp)))
+			ctx, stop := signal.NotifyContext(cmd.Context(), os.Interrupt, syscall.SIGTERM)
+			defer stop()
+			return serveDir(ctx, ln, tmp)
 		},
 	}
 	cmd.Flags().IntVar(&port, "port", 4400, "port to serve on")
