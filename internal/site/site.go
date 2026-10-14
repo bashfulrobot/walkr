@@ -46,6 +46,7 @@ type pageData struct {
 	Steps                []stepView
 	StepsJSON            template.JS
 	DeepDives            []render.DeepDive
+	Theme                Theme
 }
 
 // Options customizes a build.
@@ -55,6 +56,9 @@ type Options struct {
 	// example "../../_walkr/". The site then references vendor/ and assets/
 	// there instead of carrying its own copies.
 	SharedAssets string
+	// Theme overrides the manifest's theme when set. Empty means use the
+	// manifest value, then the default.
+	Theme string
 }
 
 // Build renders wt into outDir: index.html plus vendor/ and assets/ copied
@@ -76,7 +80,10 @@ func WriteSharedAssets(dir string) error {
 	if err := os.WriteFile(filepath.Join(dir, "assets", "style.css"), assets.StyleCSS, 0o644); err != nil {
 		return err
 	}
-	return os.WriteFile(filepath.Join(dir, "assets", "app.js"), assets.AppJS, 0o644)
+	if err := os.WriteFile(filepath.Join(dir, "assets", "app.js"), assets.AppJS, 0o644); err != nil {
+		return err
+	}
+	return copyEmbeddedDir(assets.Themes, "themes", filepath.Join(dir, "assets", "themes"))
 }
 
 // BuildWith is Build with options.
@@ -85,7 +92,13 @@ func BuildWith(wt *walkthrough.Walkthrough, outDir string, opts Options) error {
 		return err
 	}
 
+	theme, err := ResolveTheme(opts.Theme, wt.Manifest.Theme)
+	if err != nil {
+		return err
+	}
+
 	data := pageData{
+		Theme:     theme,
 		AssetBase: opts.SharedAssets,
 		Title:     wt.Manifest.Title,
 		Tagline:   wt.Manifest.Tagline,

@@ -1,0 +1,14 @@
+/* Kong theme fonts, self-hosted. Funnel Sans, Roboto Mono and Space Grotesk
+   are SIL OFL; the licence texts sit beside the files in fonts/. */
+
+@font-face { font-family: 'Funnel Sans'; font-style: normal; font-weight: 400; font-display: swap; src: url('fonts/FunnelSans-Regular.ttf') format('truetype'); }
+@font-face { font-family: 'Funnel Sans'; font-style: italic; font-weight: 400; font-display: swap; src: url('fonts/FunnelSans-Italic.ttf') format('truetype'); }
+@font-face { font-family: 'Funnel Sans'; font-style: normal; font-weight: 700; font-display: swap; src: url('fonts/FunnelSans-Bold.ttf') format('truetype'); }
+@font-face { font-family: 'Funnel Sans'; font-style: normal; font-weight: 800; font-display: swap; src: url('fonts/FunnelSans-ExtraBold.ttf') format('truetype'); }
+
+@font-face { font-family: 'Roboto Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url('fonts/RobotoMono-Regular.ttf') format('truetype'); }
+@font-face { font-family: 'Roboto Mono'; font-style: italic; font-weight: 400; font-display: swap; src: url('fonts/RobotoMono-Italic.ttf') format('truetype'); }
+@font-face { font-family: 'Roboto Mono'; font-style: normal; font-weight: 700; font-display: swap; src: url('fonts/RobotoMono-Bold.ttf') format('truetype'); }
+
+@font-face { font-family: 'Space Grotesk'; font-style: normal; font-weight: 400; font-display: swap; src: url('fonts/SpaceGrotesk-Regular.ttf') format('truetype'); }
+@font-face { font-family: 'Space Grotesk'; font-style: normal; font-weight: 700; font-display: swap; src: url('fonts/SpaceGrotesk-Bold.ttf') format('truetype'); }

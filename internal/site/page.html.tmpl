@@ -1,18 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="en"{{if .Theme.CSS}} data-theme="{{.Theme.Name}}"{{end}}>
 <head>
 <meta charset="utf-8" />
 <title>{{.Title}} &mdash; walkthrough</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="stylesheet" href="{{.AssetBase}}assets/style.css" />
-<script src="{{.AssetBase}}vendor/alpine.min.js" defer></script>
+{{if .Theme.CSS}}<link rel="stylesheet" href="{{.AssetBase}}{{.Theme.CSS}}" />
+{{end}}<script src="{{.AssetBase}}vendor/alpine.min.js" defer></script>
 <script src="{{.AssetBase}}vendor/mermaid.min.js"></script>
 </head>
 <body x-data="walker()" x-init="init()" x-on:keydown.window="onKey($event)" x-on:hashchange.window="onHashChange()">
 
   <div class="shell">
     <nav class="rail">
-      <div class="rail__brand"><span class="rail__mark">{{.Title}}</span></div>
+      <div class="rail__brand">{{if .Theme.Logo}}<img class="rail__logo" src="{{.AssetBase}}{{.Theme.Logo}}" alt="" width="44" />{{end}}<span class="rail__mark">{{.Title}}</span></div>
       <div class="rail__tag">{{.Tagline}}</div>
       <div class="rail__repo">$ {{.Repo}}</div>
 
