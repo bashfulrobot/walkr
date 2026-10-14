@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -33,8 +34,17 @@ func rootCmd() *cobra.Command {
 	return root
 }
 
+// themeFlagHelp is the --theme description shared by build, build-all and serve.
+var themeFlagHelp = "page theme: " + strings.Join(site.ThemeNames(), " or ") + " (default: the walkthrough.yaml theme, then " + site.DefaultTheme + ")"
+
+// checkTheme rejects an unknown --theme value before any work starts.
+func checkTheme(name string) error {
+	_, err := site.ResolveTheme(name, "")
+	return err
+}
+
 func buildCmd() *cobra.Command {
-	var outDir string
+	var outDir, theme string
 	cmd := &cobra.Command{
 		Use:   "build [dir]",
 		Short: "Render a walkthrough directory into a self-contained static site",
@@ -44,11 +54,14 @@ func buildCmd() *cobra.Command {
 			if len(args) == 1 {
 				dir = args[0]
 			}
+			if err := checkTheme(theme); err != nil {
+				return err
+			}
 			wt, err := walkthrough.Load(dir)
 			if err != nil {
 				return err
 			}
-			if err := site.Build(wt, outDir); err != nil {
+			if err := site.BuildWith(wt, outDir, site.Options{Theme: theme}); err != nil {
 				return err
 			}
 			fmt.Printf("built %d step(s) -> %s\n", len(wt.Steps), outDir)
@@ -56,12 +69,14 @@ func buildCmd() *cobra.Command {
 		},
 	}
 	cmd.Flags().StringVarP(&outDir, "out", "o", "site", "output directory")
+	cmd.Flags().StringVar(&theme, "theme", "", themeFlagHelp)
 	return cmd
 }
 
 func serveCmd() *cobra.Command {
 	var port int
 	var open bool
+	var theme string
 	cmd := &cobra.Command{
 		Use:   "serve [dir]",
 		Short: "Build to a temp dir and serve it locally for preview",
@@ -71,6 +86,9 @@ func serveCmd() *cobra.Command {
 			if len(args) == 1 {
 				dir = args[0]
 			}
+			if err := checkTheme(theme); err != nil {
+				return err
+			}
 			wt, err := walkthrough.Load(dir)
 			if err != nil {
 				return err
@@ -79,7 +97,7 @@ func serveCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			if err := site.Build(wt, tmp); err != nil {
+			if err := site.BuildWith(wt, tmp, site.Options{Theme: theme}); err != nil {
 				return err
 			}
 			addr := fmt.Sprintf("127.0.0.1:%d", port)
@@ -93,6 +111,7 @@ func serveCmd() *cobra.Command {
 	}
 	cmd.Flags().IntVar(&port, "port", 4400, "port to serve on")
 	cmd.Flags().BoolVar(&open, "open", false, "open the default browser")
+	cmd.Flags().StringVar(&theme, "theme", "", themeFlagHelp)
 	return cmd
 }
 
